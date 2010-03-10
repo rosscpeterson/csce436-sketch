@@ -38,7 +38,7 @@ public class TracingInterface
 	public class PaintWindow extends JPanel
 	{
 		
-		public double totalLength(ArrayList<Point> points) {
+		public double singleStrokeLength(ArrayList<Point> points) {
 			//Mike NOT COMPILED COULD HAVE ERROR WITH CASTING IN LOOP**********
 			//sqrt((x2-x1)^2 + (y2-y1)^2)
 			int i;
