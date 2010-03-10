@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
 import java.util.*;
+java.lang.Math
 
 public class TracingInterface
 {
@@ -32,9 +33,23 @@ public class TracingInterface
 	private boolean finished = false;
 	private int current_stroke = 0;
 	
+	
 	// PaintWindow class
 	public class PaintWindow extends JPanel
 	{
+		
+		public double totalLength(ArrayList<Point> points) {
+			//Mike NOT COMPILED COULD HAVE ERROR WITH CASTING IN LOOP**********
+			//sqrt((x2-x1)^2 + (y2-y1)^2)
+			int i;
+			double totalLength = 0;
+			for(i = 0; i < points.size()-1; i++) {
+				totalLength += sqrt(pow((double)(points[i+1].getX()-points[i].getX()), 2.0) + 
+					pow((double)(points[i+1].getY()-points[i].getY()), 2.0)); 
+			}
+			return totalLength;
+		}
+		
 		public boolean isOpaque()
 		{
 			return true;
