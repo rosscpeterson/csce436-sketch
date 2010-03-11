@@ -6,7 +6,7 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
 import java.util.*;
-java.lang.Math
+import java.lang.Math;
 
 public class TracingInterface
 {
@@ -44,8 +44,8 @@ public class TracingInterface
 			int i;
 			double totalLength = 0;
 			for(i = 0; i < points.size()-1; i++) {
-				totalLength += sqrt(pow((double)(points[i+1].getX()-points[i].getX()), 2.0) + 
-					pow((double)(points[i+1].getY()-points[i].getY()), 2.0)); 
+				totalLength += Math.sqrt(Math.pow((double)Math.abs(points.get(i+1).getX()-points.get(i).getX()), 2.0) + 
+					Math.pow((double)Math.abs(points.get(i+1).getY()-points.get(i).getY()), 2.0)); 
 			}
 			return totalLength;
 		}
@@ -53,9 +53,9 @@ public class TracingInterface
 		public double endToEndLength(ArrayList<Point> points) {
 			int i;
 			double totalLength = 0;
-			totalLength += sqrt(pow((double)(abs(points[points.size()-1].getX()-points[0].getX()), 2.0)) + 
-				abs(pow((double)(points[points.size()-1].getY()-points[0].getY()), 2.0))); 
-			}
+			totalLength += Math.sqrt(Math.pow((double)(Math.abs(points.get(points.size()-1).getX()-points.get(0).getX())), 2.0) + 
+				Math.pow((double)Math.abs(points.get(points.size()-1).getY()-points.get(0).getY()), 2.0)); 
+			
 			return totalLength;
 		}
 		
