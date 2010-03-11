@@ -7,6 +7,7 @@ import java.awt.event.*;
 import java.awt.*;
 import java.util.*;
 import java.lang.Math;
+import java.security.Timestamp;
 
 public class TracingInterface
 {
@@ -32,9 +33,10 @@ public class TracingInterface
 	private ArrayList<ArrayList<Point>> strokes = new ArrayList<ArrayList<Point>>();
 	private boolean finished = false;
 	private int current_stroke = 0;
+	private ArrayList<Date> timestamps = new ArrayList<Date>(); //Ross
+
 	
 	//AARON WE NEED ABSOLUTE TIME FROM START OF STROKE TO END OF STROKE
-	
 	
 	// PaintWindow class
 	public class PaintWindow extends JPanel
@@ -64,7 +66,7 @@ public class TracingInterface
 		public int numStrokes(ArrayList<ArrayList<Point>> myStrokes) {
 			return myStrokes.size();
 		}
-		}
+		
 		
 		public boolean isOpaque()
 		{
@@ -218,7 +220,15 @@ public class TracingInterface
 			past_y = curr_y;
 			curr_x = e.getX();
 			curr_y = e.getY();
+			
+			//Timestamp setup
+			Calendar calendar = Calendar.getInstance();
+			//java.util.Date now = calendar.getTime();
+			//java.sql.Timestamp curr_timestamp = new java.sql.Timestamp(now.getTime());
+			java.sql.Date curr_timestamp = new java.sql.Date(calendar.getTime().getTime());
+			
 			strokes.get(current_stroke).add(new Point(curr_x, curr_y));
+			//timestamps.get(current_stroke).add(curr_timestamp);
 			panel.repaint();
 		}
 		
