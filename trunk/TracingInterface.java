@@ -38,7 +38,7 @@ public class TracingInterface
 	public class PaintWindow extends JPanel
 	{
 		
-		public double singleStrokeLength(ArrayList<Point> points) {
+		public double singStrokeLength(ArrayList<Point> points) {
 			//Mike NOT COMPILED COULD HAVE ERROR WITH CASTING IN LOOP**********
 			//sqrt((x2-x1)^2 + (y2-y1)^2)
 			int i;
@@ -46,6 +46,15 @@ public class TracingInterface
 			for(i = 0; i < points.size()-1; i++) {
 				totalLength += sqrt(pow((double)(points[i+1].getX()-points[i].getX()), 2.0) + 
 					pow((double)(points[i+1].getY()-points[i].getY()), 2.0)); 
+			}
+			return totalLength;
+		}
+		
+		public double endToEndLength(ArrayList<Point> points) {
+			int i;
+			double totalLength = 0;
+			totalLength += sqrt(pow((double)(abs(points[points.size()-1].getX()-points[0].getX()), 2.0)) + 
+				abs(pow((double)(points[points.size()-1].getY()-points[0].getY()), 2.0))); 
 			}
 			return totalLength;
 		}
