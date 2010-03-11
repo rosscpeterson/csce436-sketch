@@ -33,13 +33,15 @@ public class TracingInterface
 	private boolean finished = false;
 	private int current_stroke = 0;
 	
+	//AARON WE NEED ABSOLUTE TIME FROM START OF STROKE TO END OF STROKE
+	
 	
 	// PaintWindow class
 	public class PaintWindow extends JPanel
 	{
 		
 		public double singStrokeLength(ArrayList<Point> points) {
-			//Mike NOT COMPILED COULD HAVE ERROR WITH CASTING IN LOOP**********
+			//Mike Chenault
 			//sqrt((x2-x1)^2 + (y2-y1)^2)
 			int i;
 			double totalLength = 0;
@@ -51,12 +53,17 @@ public class TracingInterface
 		}
 		
 		public double endToEndLength(ArrayList<Point> points) {
-			int i;
+			//Mike Chenault
 			double totalLength = 0;
 			totalLength += Math.sqrt(Math.pow((double)(Math.abs(points.get(points.size()-1).getX()-points.get(0).getX())), 2.0) + 
 				Math.pow((double)Math.abs(points.get(points.size()-1).getY()-points.get(0).getY()), 2.0)); 
 			
 			return totalLength;
+		}
+		
+		public int numStrokes(ArrayList<ArrayList<Point>> myStrokes) {
+			return myStrokes.size();
+		}
 		}
 		
 		public boolean isOpaque()
