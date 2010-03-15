@@ -69,6 +69,7 @@ public class Tools
 	}
 	
 	public double meanStrokeLength(ArrayList<ArrayList<Point>> myStrokes) {
+		//Mike Chenuault
 		return allStrokesLength(myStrokes) / (double)myStrokes.size();
 	}
 	
