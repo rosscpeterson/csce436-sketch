@@ -2,13 +2,142 @@
 //CSCE 436
 //Tools.java
 
-package sketch;
+//package sketch;
 
 import java.util.ArrayList;
 import java.awt.Point;
 
 public class Tools
 {
+	
+	//Rubines Features:
+	
+	//Rubine feature 1
+	//cos(alpha)
+	//cosine of the starting angle of the stroke
+	//Ross Peterson
+	//fist attempt, I think it's wrong, but somebody smarter might want to look at it.
+	public static double cosStartingAngle(Point p1, Point p2)
+	{
+		return ( (p2.getX() - p1.getX())
+				/
+				Math.sqrt(  Math.pow( (p2.getY()- p1.getY()), 2) + Math.pow((p2.getX()- p1.getX()), 2) ) );
+	}
+	
+	//Rubine feature 1
+	//cos(alpha)
+	//cosine of the starting angle of the stroke
+	//Ross Peterson
+	public static double cosStartingAngle(ArrayList<Point> points)
+	{
+		int secondPointIndex = 2;
+		int firstPointIndex = 0;
+		
+		Point p2 = points.get(secondPointIndex);
+		Point p1 = points.get(firstPointIndex);
+		
+		return ( (p2.getX() - p1.getX())
+				/
+				Math.sqrt(  Math.pow( (p2.getY()- p1.getY()), 2) + Math.pow((p2.getX()- p1.getX()), 2) ) );
+	}
+	
+	//Rubine feature 2
+	//sin(alpha)
+	//sine of the starting angle of the stroke
+	//Ross Peterson
+	//fist attempt, I think it's wrong, but somebody smarter might want to look at it.
+	public static double sinStartingAngle(Point p1, Point p2)
+	{	
+		return ( (p2.getY()*p1.getY())
+				/
+				Math.sqrt(  Math.pow( (p2.getY()- p1.getY()), 2) + Math.pow((p2.getX()- p1.getX()), 2) ) );
+	}
+	
+	//Rubine feature 2
+	//sin(alpha)
+	//sine of the starting angle of the stroke
+	//Ross Peterson
+	public static double sinStartingAngle(ArrayList<Point> points)
+	{	
+		int secondPointIndex = 2;
+		int firstPointIndex = 0;
+		
+		Point p2 = points.get(secondPointIndex);
+		Point p1 = points.get(firstPointIndex);
+		
+		return ( (p2.getY()*p1.getY())
+				/
+				Math.sqrt(  Math.pow( (p2.getY()- p1.getY()), 2) + Math.pow((p2.getX()- p1.getX()), 2) ) );
+	}
+	
+	//Rubine feature 3
+	//d
+	//length of the diagonal of the bounding box of the stroke
+	//Ross Peterson
+	public static double lengthOfDiagonal(ArrayList<Point> points){
+		
+		double currXmax = Double.NEGATIVE_INFINITY;
+		double currXmin = Double.POSITIVE_INFINITY;
+		Point pXmax = points.get(0); //default initialization to make Eclipse happy
+		Point pXmin = points.get(0); //default initialization to make Eclipse happy
+
+		double currYmax = Double.NEGATIVE_INFINITY;
+		double currYmin = Double.POSITIVE_INFINITY;
+		Point pYmax = points.get(0); //default initialization to make Eclipse happy
+		Point pYmin = points.get(0); //default initialization to make Eclipse happy
+		
+		for(int i=0; i<points.size(); i++){
+			
+			if( points.get(i).getX() >= currXmax )
+				pXmax = points.get(i);	
+			
+			if( points.get(i).getX() <= currXmin )
+				pXmin = points.get(i);
+			
+			if( points.get(i).getY() >= currYmax )
+				pYmax = points.get(i);
+			
+			if( points.get(i).getY() <= currYmin )
+				pYmin = points.get(i);
+		}
+		
+		return Math.sqrt( Math.pow( (pYmax.getY()- pYmin.getY()), 2) + Math.pow( (pXmax.getX()- pXmin.getX()), 2)  );
+	}
+	
+	//Rubine feature 4
+	//
+	//angle of the diagonal of the bounding box
+	public static double angleOfDiagonal(ArrayList<Point> points){
+		
+		double currXmax = Double.NEGATIVE_INFINITY;
+		double currXmin = Double.POSITIVE_INFINITY;
+		Point pXmax = points.get(0); //default initialization to make Eclipse happy
+		Point pXmin = points.get(0); //default initialization to make Eclipse happy
+
+		double currYmax = Double.NEGATIVE_INFINITY;
+		double currYmin = Double.POSITIVE_INFINITY;
+		Point pYmax = points.get(0); //default initialization to make Eclipse happy
+		Point pYmin = points.get(0); //default initialization to make Eclipse happy
+		
+		for(int i=0; i<points.size(); i++){
+			
+			if( points.get(i).getX() >= currXmax )
+				pXmax = points.get(i);	
+			
+			if( points.get(i).getX() <= currXmin )
+				pXmin = points.get(i);
+			
+			if( points.get(i).getY() >= currYmax )
+				pYmax = points.get(i);
+			
+			if( points.get(i).getY() <= currYmin )
+				pYmin = points.get(i);
+		}
+		
+		return Math.atan( ( pYmax.getY() - pYmin.getY() ) / ( pXmax.getX() - pXmin.getX() ) );
+		
+	}
+	
 	//gets the distance between two points
 	//Mike Chenault
 	public static double getLength(Point p1, Point p2)
@@ -110,7 +239,7 @@ public class Tools
 		return totalLength / (double)myStrokes.size();
 	}
 
-	//connects all the strokes to make one continious stroke
+	//connects all the strokes to make one continuous stroke
 	//Mike Chenault
 	public static ArrayList<Stroke> connectAllStrokes(ArrayList<Stroke> myStrokes)
 	{
@@ -153,7 +282,7 @@ public class Tools
 		return newStrokes;
 	}
 
-	//Connects begining of each stroke to every point of every other stroke
+	//Connects beginning of each stroke to every point of every other stroke
 	//Mike Chenault
 	public static ArrayList<Stroke> lsdEverything(ArrayList<Stroke> myStrokes)
 	{
@@ -193,7 +322,7 @@ public class Tools
 	}
 
 	/***	This code incorrectly mirrors vertically.  Why? I don't know!  ***/
-	//Mirrors a stroke accross a horizontal line
+	//Mirrors a stroke across a horizontal line
 	//Mike Chenault
 	public static Stroke mirrorVerticalStroke(Stroke stroke, int windowSize_Y)
 	{
@@ -207,7 +336,7 @@ public class Tools
 		return newStroke;
 	}
 
-	//Mirrors all strokes accross a verical line
+	//Mirrors all strokes across a vertical line
 	//Mike Chenault
 	public static ArrayList<Stroke> mirrorAllHorizontal(ArrayList<Stroke> strokes, int windowSize_X)
 	{
@@ -220,7 +349,7 @@ public class Tools
 	}
 
 	/***	This code incorrectly mirrors vertically.  Why? I don't know!  ***/
-	//Mirrors all strokes accross a horizontal line
+	//Mirrors all strokes across a horizontal line
 	//Mike Chenault
 	public static ArrayList<Stroke> mirrorAllVertical(ArrayList<Stroke> strokes, int windowSize_Y)
 	{
@@ -268,5 +397,6 @@ public class Tools
 		}
 		return newStrokes;
 	}
+	
+	
 }
-
