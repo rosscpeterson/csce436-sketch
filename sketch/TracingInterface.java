@@ -1,6 +1,8 @@
-// Aaron Loveall, Mike Chenault, Travis Kosarek, and Ross Peterson
-// CSCE 436
-// TracingInterface.java
+//Aaron Loveall, Mike Chenault, Travis Kosarek, and Ross Peterson
+//CSCE 436
+//TracingInterface.java
+
+package sketch;
 
 import javax.swing.JFrame;
 import javax.swing.JCheckBoxMenuItem;
@@ -17,8 +19,6 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 
 public class TracingInterface
 {
@@ -27,7 +27,6 @@ public class TracingInterface
 	public final static int WINDOW_LOCATION_Y = 100;
 	public final static int WINDOW_SIZE_X = 850;
 	public final static int WINDOW_SIZE_Y = 800;
-	private static Date initialApplicationTimeStamp;
 
 	// Member variables
 	private JFrame window;
@@ -66,8 +65,6 @@ public class TracingInterface
 	private PaintWindow panel;
 	private int curr_x;
 	private int curr_y;
-	private int past_x;
-	private int past_y;
 	private Color curr_color;
 	private ArrayList<Stroke> strokes;
 	private ArrayList<Stroke> drawnStrokes;
@@ -79,16 +76,11 @@ public class TracingInterface
 		// initializing values for the first stroke
 		curr_x = 0;
 		curr_y = 0;
-		past_x = 0;
-		past_y = 0;
 		curr_color = Color.black;
 		strokes = new ArrayList<Stroke>();
 		strokes.add(new Stroke(curr_color));
 		drawnStrokes = new ArrayList<Stroke>();
 		current_stroke = 0;
-
-		// might come in handy for a "feature"
-		initialApplicationTimeStamp = new Date();
 
 		// set up the window
 		window = new JFrame("Tracing Interface");
@@ -550,8 +542,6 @@ public class TracingInterface
 			// When mouse is released, clear curr_x, curr_y, past_x, and past_y
 			curr_x = 0;
 			curr_y = 0;
-			past_x = 0;
-			past_y = 0;
 
 			panel.printSingleStrokeFeatureAnalysis();
 			panel.printMultiStrokeFeatureAnalysis();
@@ -569,8 +559,6 @@ public class TracingInterface
 		public void mouseDragged(MouseEvent e)
 		{
 			// X and Y values
-			past_x = curr_x;
-			past_y = curr_y;
 			curr_x = e.getX();
 			curr_y = e.getY();
 			strokes.get(current_stroke).addPoint(new Point(curr_x, curr_y));
@@ -589,6 +577,7 @@ public class TracingInterface
 
 	public static void main(String[]args)
 	{
-		TracingInterface trace = new TracingInterface();
+		new TracingInterface();
 	}
 }
+

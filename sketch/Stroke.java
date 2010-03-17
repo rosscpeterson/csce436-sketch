@@ -1,6 +1,8 @@
-// Aaron Loveall, Mike Chenault, Travis Kosarek, and Ross Peterson
-// CSCE 436
-// Stroke.java
+//Aaron Loveall, Mike Chenault, Travis Kosarek, and Ross Peterson
+//CSCE 436
+//Stroke.java
+
+package sketch;
 
 import java.util.ArrayList;
 import java.util.Date;
