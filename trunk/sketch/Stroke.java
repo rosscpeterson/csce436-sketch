@@ -2,7 +2,7 @@
 //CSCE 436
 //Stroke.java
 
-package sketch;
+//package sketch;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -127,6 +127,13 @@ public class Stroke
 			output += "]\t";
 			output += getStrokeTimestamp(i).getTime();
 			output += "\n";
+			
+			//Ross testing area
+			//output += " cosStartingAngle = " + Tools.cosStartingAngle(points);
+			//output += ",";
+			//output += " sinStartingAngle = " + Tools.sinStartingAngle(points);
+			
+			
 		}
 
 		return output;

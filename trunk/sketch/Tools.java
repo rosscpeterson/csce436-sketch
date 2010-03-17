@@ -4,6 +4,7 @@
 
 //package sketch;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.awt.Point;
 
@@ -67,7 +68,8 @@ public class Tools
 		
 		return ( (p2.getY()*p1.getY())
 				/
-				Math.sqrt(  Math.pow( (p2.getY()- p1.getY()), 2) + Math.pow((p2.getX()- p1.getX()), 2) ) );
+				Math.sqrt(  Math.pow( (p2.getY() - p1.getY()), 2) + 
+							Math.pow( (p2.getX() - p1.getX()), 2) ) );
 	}
 	
 	//Rubine feature 3
@@ -101,12 +103,13 @@ public class Tools
 				pYmin = points.get(i);
 		}
 		
-		return Math.sqrt( Math.pow( (pYmax.getY()- pYmin.getY()), 2) + Math.pow( (pXmax.getX()- pXmin.getX()), 2)  );
+		return Math.sqrt( Math.pow( (pYmax.getY()- pYmin.getY()), 2) + 
+						  Math.pow( (pXmax.getX()- pXmin.getX()), 2) );
 	}
 	
 	//Rubine feature 4
-	//
 	//angle of the diagonal of the bounding box
+	//Ross Peterson
 	public static double angleOfDiagonal(ArrayList<Point> points){
 		
 		double currXmax = Double.NEGATIVE_INFINITY;
@@ -134,8 +137,227 @@ public class Tools
 				pYmin = points.get(i);
 		}
 		
-		return Math.atan( ( pYmax.getY() - pYmin.getY() ) / ( pXmax.getX() - pXmin.getX() ) );
+		return Math.atan( ( pYmax.getY() - pYmin.getY() ) / 
+						  ( pXmax.getX() - pXmin.getX() ) );	
+	}
+	
+	//Rubine feature 5
+	//distance between the start and end point of the stroke
+	//Ross Peterson
+	//note: Mike has done something similar to this...
+	public static double strokeDistance(ArrayList<Point> points)
+	{
+		Point p0 = points.get(0);
+		Point pNminus1 = points.get(points.size()-1);
 		
+		return Math.sqrt( Math.pow( (pNminus1.getX()- p0.getX()), 2) + 
+						  Math.pow( (pNminus1.getY()- p0.getY()), 2) );
+	}
+	
+	//Rubine features 6 and 7 used to calculate:
+	//The ending angle of the stroke
+	//i.e. the angle between the horizontal line and the line
+	//formed  by the first and last point of the stroke.
+	
+	//Rubine feature 6
+	//cos(Beta) 
+	//Ross Peterson
+	public static double cosEndingAngle(ArrayList<Point> points)
+	{
+		Point p0 = points.get(0);
+		Point pN = points.get(points.size());
+		
+		return ( (pN.getX() * p0.getX()) / strokeDistance(points) );
+	}
+	
+	//Rubine feature 7
+	//sin(Beta)
+	//Ross Peterson
+	public static double sinEndingAngle(ArrayList<Point> points)
+	{
+		Point p0 = points.get(0);
+		Point pN = points.get(points.size());	
+		
+		return ( (pN.getY() * p0.getY()) / strokeDistance(points) );
+	}
+	
+	//Rubine feature 8
+	//total length of the path of a stroke
+	//It looks like Mike Chenault has covered this through his singleStrokeLength function
+	
+	//Rubine feature 9
+	//total rotational change in a stroke
+	//Sum from p=1 to n-2 of theta(p)
+	//theta(p) = arctan[(Dxp*Dyp-1Dxp-1*Dyp)=(Dxp*Dxp-1 + Dyp * Dyp-1)]
+	//this could be wrong...
+	//Ross Peterson
+	public static double totalRotationalChange(ArrayList<Point> points){
+		
+		double totalRotationalChange = 0;
+		for(int i = points.size()-2; i > 1; i--){
+
+			Point p 	  = points.get(i);
+			Point pMinus1 = points.get(i-1);
+			Point pMinus2 = points.get(i-2);
+			
+			totalRotationalChange += Math.atan(
+					(
+					( (p.getX()       - pMinus1.getX()) * (pMinus1.getY() - pMinus2.getY()) ) *
+					( (pMinus1.getX() - pMinus2.getX()) * (p.getY()       - pMinus1.getY())   ) 
+					)/(
+					( (p.getX()-pMinus1.getX()) * (pMinus1.getX()-pMinus2.getX()) ) +
+					( (p.getY()-pMinus1.getY()) * (pMinus1.getY()-pMinus2.getY()) ) 
+					)
+				    );
+		}
+		return totalRotationalChange;
+	}
+	
+	//Rubine feature 10
+	//total absolute rotation change
+	//Ross Peterson
+	public static double absoluteTotalRotationalChange(ArrayList<Point> points){
+		
+		double totalRotationalChange = 0;
+		for(int i = points.size()-2; i > 1; i--){
+
+			Point p 	  = points.get(i);
+			Point pMinus1 = points.get(i-1);
+			Point pMinus2 = points.get(i-2);
+			
+			totalRotationalChange += Math.abs(Math.atan(
+					(
+					( (p.getX()       - pMinus1.getX()) * (pMinus1.getY() - pMinus2.getY()) ) *
+					( (pMinus1.getX() - pMinus2.getX()) * (p.getY()       - pMinus1.getY())   ) 
+					)/(
+					( (p.getX()-pMinus1.getX()) * (pMinus1.getX()-pMinus2.getX()) ) +
+					( (p.getY()-pMinus1.getY()) * (pMinus1.getY()-pMinus2.getY()) ) 
+					)
+				    ));
+		}
+		return totalRotationalChange;
+	}
+	
+	//Rubine feature 11
+	//smoothness of the stroke
+	//sum of the squared value of the absolute values of the angles between each stroke
+	//Ross Peterson
+	public static double smoothness(ArrayList<Point> points){
+		
+		double totalRotationalChange = 0;
+		for(int i = points.size()-2; i > 1; i--){
+
+			Point p 	  = points.get(i);
+			Point pMinus1 = points.get(i-1);
+			Point pMinus2 = points.get(i-2);
+			
+			totalRotationalChange += Math.pow(
+										Math.abs(Math.atan(
+										(
+										( (p.getX()       - pMinus1.getX()) * (pMinus1.getY() - pMinus2.getY()) ) *
+										( (pMinus1.getX() - pMinus2.getX()) * (p.getY()       - pMinus1.getY())   ) 
+										)/(
+										( (p.getX()-pMinus1.getX()) * (pMinus1.getX()-pMinus2.getX()) ) +
+										( (p.getY()-pMinus1.getY()) * (pMinus1.getY()-pMinus2.getY()) ) 
+										)
+									    ))
+									    , 2);
+		}
+		return totalRotationalChange;
+	}
+	
+	//Rubine feature 12
+	//the squared value of the maximum speed reached
+	//essentially finds the maximum speed reached making the stroke
+	public static double maximumSpeedSquared(ArrayList<Point> points, ArrayList<Date> timestamps){
+		
+		double maximumSpeed = Double.NEGATIVE_INFINITY;
+		
+		for(int i = 1; i < points.size()-2; i++){
+			
+			Point p 	  = points.get(i);
+			Point pMinus1 = points.get(i-1);
+			
+			Date t       = timestamps.get(i);
+			Date tMinus1 = timestamps.get(i-1);
+			
+			double d = t.getTime() - tMinus1.getTime();
+			
+			double currSpeed  = (
+					   			 ( Math.pow((p.getX()-pMinus1.getX()),2) + Math.pow((p.getX()-pMinus1.getX()),2) ) /
+					   			 Math.pow( d,2 ) 
+					  			);
+			if( currSpeed > maximumSpeed )
+			 	{ maximumSpeed = currSpeed; }
+			}
+		return maximumSpeed;
+	}
+	
+	//minimum speed
+	//Ross Peterson
+	public static double minimumSpeedSquared(ArrayList<Point> points, ArrayList<Date> timestamps){
+		
+		double minimumSpeed = Double.POSITIVE_INFINITY;
+		
+		for(int i = 1; i < points.size()-2; i++){
+			
+			Point p 	  = points.get(i);
+			Point pMinus1 = points.get(i-1);
+			
+			Date t       = timestamps.get(i);
+			Date tMinus1 = timestamps.get(i-1);
+			
+			double d = t.getTime() - tMinus1.getTime();
+			
+			double currSpeed  = (
+					   			 ( Math.pow((p.getX()-pMinus1.getX()),2) + Math.pow((p.getX()-pMinus1.getX()),2) ) /
+					   			 Math.pow( d,2 ) 
+					  			);
+			if( currSpeed < minimumSpeed )
+			 	{ minimumSpeed = currSpeed; }
+			}
+		return minimumSpeed;
+	}
+
+	//average speed
+	//Ross Peterson
+	public static double averageSpeedSquared(ArrayList<Point> points, ArrayList<Date> timestamps){
+		
+		double averageSpeed = 0;
+		double totalSpeed = 0;
+		
+		for(int i = 1; i < points.size()-2; i++){
+			
+			Point p 	  = points.get(i);
+			Point pMinus1 = points.get(i-1);
+			
+			Date t       = timestamps.get(i);
+			Date tMinus1 = timestamps.get(i-1);
+			
+			double d = t.getTime() - tMinus1.getTime();
+			
+			totalSpeed  += (
+					   			 ( Math.pow((p.getX()-pMinus1.getX()),2) + Math.pow((p.getX()-pMinus1.getX()),2) ) /
+					   			 Math.pow( d,2 ) 
+					  			);
+			}
+			
+		averageSpeed = totalSpeed / points.size();	
+		return averageSpeed;
+	}
+	
+	//Rubine feature 13
+	//stroke time
+	//Ross Peterson
+	public static double strokeTime(ArrayList<Point> points, ArrayList<Date> timestamps){
+	
+	Date tNminus1 = timestamps.get(timestamps.size()-1);
+	Date t0 	  = timestamps.get(0);
+	
+	double strokeTime = tNminus1.getTime() - t0.getTime();
+	
+	return strokeTime;
+	
 	}
 	
 	//gets the distance between two points
@@ -145,7 +367,7 @@ public class Tools
 		return Math.sqrt(Math.pow((double)Math.abs(p2.getX()-p1.getX()), 2.0) +
 				Math.pow((double)Math.abs(p2.getY()-p1.getY()), 2.0));
 	}
-
+	
 	//sqrt((x2-x1)^2 + (y2-y1)^2)
 	//Mike Chenault
 	public static double singleStrokeLength(ArrayList<Point> points)
@@ -400,3 +622,4 @@ public class Tools
 	
 	
 }
+
