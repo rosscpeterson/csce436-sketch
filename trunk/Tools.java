@@ -112,11 +112,32 @@ public class Tools
 		return newStrokes;
 	}
 	
+	public ArrayList<ArrayList<Point>> lsdEverything(ArrayList<ArrayList<Point>> myStrokes) {
+		//Mike Chenault
+		//Connects begining of each stroke to every point of every other stroke
+		int i, j, k;
+		ArrayList<ArrayList<Point>> newStrokes = new ArrayList<ArrayList<Point>>();
+		newStrokes.equals(myStrokes);
+		for(k=0; k < myStrokes.size(); k++) {
+			Point startPoint = myStrokes.get(k).get(0);
+			for(j = 0; j < myStrokes.size(); j++) {
+				//newStrokes.add(points);  //make sure the origional stroke is added
+				for(i = 1; i < myStrokes.get(j).size(); i++) {
+					ArrayList<Point> newStroke = new ArrayList<Point>();
+					newStroke.add(startPoint);
+					newStroke.add(myStrokes.get(j).get(i));
+					newStrokes.add(newStroke);
+				}
+			}
+		}
+		return newStrokes;
+	}
+	
 	public ArrayList<ArrayList<Point>> connectAllStrokes(ArrayList<ArrayList<Point>> myStrokes) {
 		//Mike Chenault
 		//connects all the strokes to make one continious stroke
 		int i;
-		ArrayList<ArrayList<Point>> newStrokes = new ArrayList<ArrayList<Point>>();;
+		ArrayList<ArrayList<Point>> newStrokes = new ArrayList<ArrayList<Point>>();
 		newStrokes.equals(myStrokes);
 		
 		for(i = 0; i < myStrokes.size() - 1; i++) {
@@ -127,4 +148,64 @@ public class Tools
 		}
 		return newStrokes;
 	}
+	
+	public ArrayList<Point> mirrorHorizontalStroke(ArrayList<Point> stroke, int windowSize_X) {
+		//Mike Chenault
+		//Mirrors a stroke along a vertical line
+		ArrayList<Point> newStroke = new ArrayList<Point>();
+		for(int i = 0; i < stroke.size(); i++) {
+			int diff = windowSize_X - (int)stroke.get(i).getX();
+			Point newPoint = new Point(diff, (int)stroke.get(i).getY());
+			newStroke.add(newPoint);
+		}
+		return newStroke;
+	}
+	
+	public ArrayList<Point> mirrorVerticalStroke(ArrayList<Point> stroke, int windowSize_Y) {
+		//Mike Chenault
+		//Mirrors a stroke accross a horizontal line
+		ArrayList<Point> newStroke = new ArrayList<Point>();
+		for(int i = 0; i < stroke.size(); i++) {
+			int diff = windowSize_Y - (int)stroke.get(i).getY();
+			Point newPoint = new Point((int)stroke.get(i).getY(), diff);
+			newStroke.add(newPoint);
+		}
+		return newStroke;
+	}
+	
+	public ArrayList<ArrayList<Point>> mirrorAllHorizontal(ArrayList<ArrayList<Point>> strokes, int windowSize_X) {
+		//Mike Chenault
+		//Mirrors all strokes accross a verical line
+		ArrayList<ArrayList<Point>> newStrokes = new ArrayList<ArrayList<Point>>();
+		for(int i = 0; i < strokes.size(); i++) {
+			newStrokes.add(mirrorHorizontalStroke(strokes.get(i), windowSize_X));
+		}		
+		return newStrokes;
+	}
+	
+	public ArrayList<ArrayList<Point>> mirrorAllVertical(ArrayList<ArrayList<Point>> strokes, int windowSize_Y) {
+		//Mike Chenault
+		//Mirrors all strokes accross a horizontal line
+		ArrayList<ArrayList<Point>> newStrokes = new ArrayList<ArrayList<Point>>();
+		for(int i = 0; i < strokes.size(); i++) {
+			newStrokes.add(mirrorVerticalStroke(strokes.get(i), windowSize_Y));
+		}		
+		return newStrokes;
+	}
+	
+	public ArrayList<ArrayList<Point>> makeAllDashed(ArrayList<ArrayList<Point>> strokes) {
+		//Mike Chenault
+		//Removes every other segment of a stroke to make all the stroke appear dashed
+		ArrayList<ArrayList<Point>> newStrokes = new ArrayList<ArrayList<Point>>();
+		for(int i = 0; i < strokes.size(); i++) {
+			for(int j = 2; j < strokes.get(i).size(); j+=2) {
+				ArrayList<Point> newStroke = new ArrayList<Point>();
+				newStroke.add(strokes.get(i).get(j-2));
+				newStroke.add(strokes.get(i).get(j));
+				newStrokes.add(newStroke);
+			}
+		}
+		return newStrokes;
+	}
+	
 }
