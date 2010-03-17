@@ -9,17 +9,25 @@ import java.awt.Color;
 
 public class Stroke
 {
-	private ArrayList<Point> points = new ArrayList<Point>();
+	private ArrayList<Point> points;
 
 	// Change to milliseconds
-	private ArrayList<Date> timestamps = new ArrayList<Date>();
-	private Color color = Color.black;
+	private ArrayList<Date> timestamps;
+	private Color color;
 	private Date begin_date, end_date;
 
 	// Constructor
-	Stroke(){}
+	Stroke()
+	{
+		points = new ArrayList<Point>();
+		timestamps = new ArrayList<Date>();
+		color = Color.black;
+	}
+
 	Stroke(Color c)
 	{
+		points = new ArrayList<Point>();
+		timestamps = new ArrayList<Date>();
 		color = c;
 	}
 
@@ -27,6 +35,7 @@ public class Stroke
 	public void addPoint(Point pt)
 	{
 		points.add(pt);
+		addTimestamp(new Date());
 	}
 
 	// Adds a timestamp
@@ -42,6 +51,12 @@ public class Stroke
 	public Point getPoint(int index)
 	{
 		return points.get(index);
+	}
+
+	// Returns an ArrayList of Points defining the Stroke
+	public ArrayList<Point> getPoints()
+	{
+		return points;
 	}
 
 	// Gets a timestamp at the index
@@ -96,5 +111,22 @@ public class Stroke
 	public int getSize()
 	{
 		return points.size();
+	}
+
+	public String toString()
+	{
+		String output = new String();
+		for(int i = 0; i < this.getSize(); i++)
+		{
+			output += "[x = ";
+			output += points.get(i).getX();
+			output += ", y = ";
+			output += points.get(i).getY();
+			output += "]\t";
+			output += getStrokeTimestamp(i).getTime();
+			output += "\n";
+		}
+
+		return output;
 	}
 }
