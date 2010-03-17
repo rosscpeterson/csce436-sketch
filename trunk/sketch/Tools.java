@@ -1,6 +1,8 @@
-// Aaron Loveall, Mike Chenault, Travis Kosarek, and Ross Peterson
-// CSCE 436
-// Tools.java
+//Aaron Loveall, Mike Chenault, Travis Kosarek, and Ross Peterson
+//CSCE 436
+//Tools.java
+
+package sketch;
 
 import java.util.ArrayList;
 import java.awt.Point;
@@ -267,3 +269,4 @@ public class Tools
 		return newStrokes;
 	}
 }
+
