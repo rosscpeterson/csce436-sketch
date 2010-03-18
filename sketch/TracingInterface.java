@@ -1,15 +1,15 @@
-//Aaron Loveall, Mike Chenault, Travis Kosarek, and Ross Peterson
-//CSCE 436
-//TracingInterface.java
-
-package sketch;
+// Aaron Loveall, Mike Chenault, Travis Kosarek, and Ross Peterson
+// CSCE 436
+// TracingInterface.java
 
 import javax.swing.JFrame;
-import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JCheckBox;
 import javax.swing.JMenuItem;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
+import javax.swing.JButton;
+import javax.swing.JLayeredPane;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
@@ -19,157 +19,97 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 public class TracingInterface
 {
 	// Constants
-	public final static int WINDOW_LOCATION_X = 100;
-	public final static int WINDOW_LOCATION_Y = 100;
-	public final static int WINDOW_SIZE_X = 850;
-	public final static int WINDOW_SIZE_Y = 800;
+	public final static int WINDOW_LOCATION_X = 25;
+	public final static int WINDOW_LOCATION_Y = 25;
+	public final static int WINDOW_SIZE_X = 700;
+	public final static int WINDOW_SIZE_Y = 700;
+	private static Date initialApplicationTimeStamp;
 
 	// Member variables
 	private JFrame window;
+	private JFrame analyzeWindow;
 	private JMenuBar menuBar;
 	private JMenu file;
-	private JMenuItem	clear,
-						quit;
+	private JMenuItem clear, quit;
 	private JMenu color;
-	private JMenuItem	blue,
-						black,
-						red,
-						green,
-						yellow,
-						orange,
-						magenta;
-	private JMenu ssfa;
-	private JCheckBoxMenuItem	gross_length_of_stroke,
-								net_length_of_stroke;
-	private JMenu msfa;
-	private JCheckBoxMenuItem 	min_length_of_strokes,
-								max_length_of_strokes,
-								avg_length_of_strokes,
-								number_of_strokes,
-								avg_distance_between_strokes;
-	private JMenu ssfm;
-	private JCheckBoxMenuItem	lsd_effect,
-								mirror_horizontal,
-								mirror_vertical,
-								dashed;
-	private JMenu msfm;
-	private JCheckBoxMenuItem	connect_strokes,
-								multi_lsd_effect,
-								mirror_all_horizontal,
-								mirror_all_vertical,
-								all_dashed;
+	private JMenuItem blue, black, red, green, yellow, orange, magenta;
+	private JMenu analyze;
+	private JMenuItem analyzeStroke;
+	private JButton analyzeButton;
 	private PaintWindow panel;
 	private int curr_x;
 	private int curr_y;
 	private Color curr_color;
 	private ArrayList<Stroke> strokes;
-	private ArrayList<Stroke> drawnStrokes;
+	private ArrayList<Stroke> modifiedStrokes;
 	private int current_stroke;
 
 	// Constructor
 	public TracingInterface()
 	{
-		// initializing values for the first stroke
+		// Initializing values for the first stroke
 		curr_x = 0;
 		curr_y = 0;
 		curr_color = Color.black;
 		strokes = new ArrayList<Stroke>();
 		strokes.add(new Stroke(curr_color));
-		drawnStrokes = new ArrayList<Stroke>();
+		modifiedStrokes = new ArrayList<Stroke>();
 		current_stroke = 0;
 
-		// set up the window
+		// Set up initial date for the application
+		initialApplicationTimeStamp = new Date();
+
+		// Set up the window
 		window = new JFrame("Tracing Interface");
 		window.setLocation(WINDOW_LOCATION_X, WINDOW_LOCATION_Y);
 		window.setSize(WINDOW_SIZE_X, WINDOW_SIZE_Y);
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		// add the file menu and the color menu to the menu bar
 		menuBar = new JMenuBar();
 		file = new JMenu("File");
-		menuBar.add(file);
 		color = new JMenu("Color");
+		analyze = new JMenu("Analyze");
+		menuBar.add(file);
 		menuBar.add(color);
-		ssfa = new JMenu("Single Stroke Feature Analysis");
-		menuBar.add(ssfa);
-		msfa = new JMenu("Multi Stroke Feature Analysis");
-		menuBar.add(msfa);
-		ssfm = new JMenu("Single Stroke Feature Modification");
-		menuBar.add(ssfm);
-		msfm = new JMenu("Multi Stroke Feature Modification");
-		menuBar.add(msfm);
+		menuBar.add(analyze);
 
 		// Set up the file menu
 		clear = new JMenuItem("Clear");
-		file.add(clear);
 		quit = new JMenuItem("Quit");
+		file.add(clear);
 		file.add(quit);
 
 		// Set up the color menu
 		blue = new JMenuItem("Blue");
-		color.add(blue);
 		black = new JMenuItem("Black");
-		color.add(black);
 		red = new JMenuItem("Red");
-		color.add(red);
 		green = new JMenuItem("Green");
-		color.add(green);
 		yellow = new JMenuItem("Yellow");
-		color.add(yellow);
 		orange = new JMenuItem("Orange");
-		color.add(orange);
 		magenta = new JMenuItem("Magenta");
+		color.add(blue);
+		color.add(black);
+		color.add(red);
+		color.add(green);
+		color.add(yellow);
+		color.add(orange);
 		color.add(magenta);
-
-		// Set up the single stroke feature analysis menu
-		gross_length_of_stroke = new JCheckBoxMenuItem("Gross Length of Stroke");
-		ssfa.add(gross_length_of_stroke);
-		net_length_of_stroke = new JCheckBoxMenuItem("Net Length of Stroke");
-		ssfa.add(net_length_of_stroke);
-
-		// Set up the multi stroke feature analysis menu
-		min_length_of_strokes = new JCheckBoxMenuItem("Minimum Length of Stroke");
-		msfa.add(min_length_of_strokes);
-		max_length_of_strokes = new JCheckBoxMenuItem("Max Length of Stroke");
-		msfa.add(max_length_of_strokes);
-		avg_length_of_strokes = new JCheckBoxMenuItem("Average Length of Stroke");
-		msfa.add(avg_length_of_strokes);
-		number_of_strokes = new JCheckBoxMenuItem("Number of Stroke");
-		msfa.add(number_of_strokes);
-		avg_distance_between_strokes = new JCheckBoxMenuItem("Average Distance between Stroke");
-		msfa.add(avg_distance_between_strokes);
-
-		// Set up the single stroke feature modification menu
-		lsd_effect = new JCheckBoxMenuItem("LSD Effect");
-		ssfm.add(lsd_effect);
-		mirror_horizontal = new JCheckBoxMenuItem("Mirror Horizontal");
-		ssfm.add(mirror_horizontal);
-		mirror_vertical = new JCheckBoxMenuItem("Mirror Vertical");
-		ssfm.add(mirror_vertical);
-		dashed = new JCheckBoxMenuItem("Dashed");
-		ssfm.add(dashed);
-
-		// Set up the multi stroke feature modification menu
-		connect_strokes = new JCheckBoxMenuItem("Connect All Strokes");
-		msfm.add(connect_strokes);
-		multi_lsd_effect = new JCheckBoxMenuItem("Multi Stroke LSD Effect");
-		msfm.add(multi_lsd_effect);
-		mirror_all_horizontal = new JCheckBoxMenuItem("Mirror All Horizontal");
-		msfm.add(mirror_all_horizontal);
-		mirror_all_vertical = new JCheckBoxMenuItem("Mirror All Vertical");
-		msfm.add(mirror_all_vertical);
-		all_dashed = new JCheckBoxMenuItem("Make All Dashed");
-		msfm.add(all_dashed);
-
+		
+		// Set up the analyze menu
+		analyzeStroke = new JMenuItem("Analyze Stroke");
+		analyze.add(analyzeStroke);
 
 		// Add the actionListeners
 		MenuListener menulistener = new MenuListener();
 		quit.addActionListener(menulistener);
 		clear.addActionListener(menulistener);
+		analyzeStroke.addActionListener(menulistener);
 
 		ColorListener colorlistener = new ColorListener();
 		blue.addActionListener(colorlistener);
@@ -180,35 +120,7 @@ public class TracingInterface
 		orange.addActionListener(colorlistener);
 		magenta.addActionListener(colorlistener);
 
-		FeatureListener featurelistener = new FeatureListener();
-		//Mike's Features
-		gross_length_of_stroke.addActionListener(featurelistener);
-		net_length_of_stroke.addActionListener(featurelistener);
-		min_length_of_strokes.addActionListener(featurelistener);
-		max_length_of_strokes.addActionListener(featurelistener);
-		avg_length_of_strokes.addActionListener(featurelistener);
-		number_of_strokes.addActionListener(featurelistener);
-		avg_distance_between_strokes.addActionListener(featurelistener);
-		lsd_effect.addActionListener(featurelistener);
-		connect_strokes.addActionListener(featurelistener);
-		multi_lsd_effect.addActionListener(featurelistener);
-		mirror_horizontal.addActionListener(featurelistener);
-		mirror_vertical.addActionListener(featurelistener);
-		mirror_all_horizontal.addActionListener(featurelistener);
-		mirror_all_vertical.addActionListener(featurelistener);
-		dashed.addActionListener(featurelistener);
-		all_dashed.addActionListener(featurelistener);
-
-		//Aaron's Features
-
-
-		//Ross' Features
-
-
-		//Travis' Features
-
-
-		// create the panel with its own listeners
+		// Create the panel with its own listeners
 		panel = new PaintWindow();
 		panel.setBackground(Color.white);
 		panel.setOpaque(true);
@@ -216,7 +128,7 @@ public class TracingInterface
 		panel.addMouseMotionListener(new PaintListener());
 		panel.addMouseListener(new MouseUpListener());
 
-		// add the menu bar and the panel to the window
+		// Add the menu bar and the panel to the window
 		window.setJMenuBar(menuBar);
 		window.add(panel);
 
@@ -225,6 +137,7 @@ public class TracingInterface
 		window.setResizable(false);
 	}
 
+	// Listener for various menu options
 	private class MenuListener implements ActionListener
 	{
 		public void actionPerformed(ActionEvent e)
@@ -233,9 +146,17 @@ public class TracingInterface
 				System.exit(0);
 			else if (e.getSource() == clear)
 				panel.clearPaintWindow();
+			else if (e.getSource() == analyzeStroke)
+				printAnalysis();
+			else if (e.getSource() == analyzeButton)
+			{
+				analyzeWindow.setVisible(false);
+				// Print out the analysis in a new window possibly
+			}
 		}
 	}
 
+	// Listener for the color options
 	private class ColorListener implements ActionListener
 	{
 		public void actionPerformed(ActionEvent e)
@@ -254,18 +175,7 @@ public class TracingInterface
 				curr_color = Color.orange;
 			else if (e.getSource() == magenta)
 				curr_color = Color.magenta;
-			// set the current color of the current stroke in case it changed
 			strokes.get(current_stroke).setColor(curr_color);
-		}
-	}
-
-	private class FeatureListener implements ActionListener
-	{
-		public void actionPerformed(ActionEvent e)
-		{
-			panel.printSingleStrokeFeatureAnalysis();
-			panel.printMultiStrokeFeatureAnalysis();
-			panel.paintComponent(panel.getGraphics());
 		}
 	}
 
@@ -277,7 +187,7 @@ public class TracingInterface
 			super();
 		}
 
-		private void printSingleStrokeFeatureAnalysis()
+		/*private void printSingleStrokeFeatureAnalysis()
 		{
 			//initial check to see if there are strokes and that those strokes have more than one point in them
 			if(strokes.size()>0 && strokes.get(0).getPoints().size()>1)
@@ -477,55 +387,99 @@ public class TracingInterface
 
 			}
 		}
+		}*/
 
-		private void applyNoModifications()
-		{
-			//if there are no modifications add all the original strokes
-			if(	((strokes.size()>2) && (!(connect_strokes.getState())) ||
-					multi_lsd_effect.getState() ||
-					mirror_all_horizontal.getState() ||
-					mirror_all_vertical.getState() ||
-					all_dashed.getState()) || ((strokes.size()<=2)))
-			{
-				for(Stroke stroke : strokes)
-				{
-					drawnStrokes.add(stroke);
-				}
-			}
-		}
-
+		// Paints the components in the window
 		protected void paintComponent(Graphics g)
 		{
 			super.paintComponent(g);
-			applySingleStrokeFeatureModifications();
-			applyMultiStrokeFeatureModifications();
-			applyNoModifications();
-			drawStrokes(g);
+			if (modifiedStrokes.size() == 0 && strokes.size() == 0);
+			else if (modifiedStrokes.size() == 0)
+				drawInitialStrokes(g);
+			else
+				drawModifiedStrokes(g);
 		}
-
-		public void drawStrokes(Graphics g)
+		
+		// Draws all the initial strokes
+		public void drawInitialStrokes(Graphics g)
 		{
-			// iterate through all strokes previously drawn and draw them to the screen
-			// note: the JPanel is "double buffered" so this operation is actually really fast
-			for(Stroke drawnStroke : drawnStrokes)
+			for(Stroke stroke : strokes)
 			{
-				g.setColor(drawnStroke.getColor());
-				for(int i = 0; i < drawnStroke.getSize()-1; i++)
+				g.setColor(stroke.getColor());
+				for(int i = 0; i < stroke.getSize()-1; i++)
 				{
-					g.drawLine((int)drawnStroke.getPoint(i).getX(), (int)drawnStroke.getPoint(i).getY(), (int)drawnStroke.getPoint(i+1).getX(), (int)drawnStroke.getPoint(i+1).getY());
+					g.drawLine((int)stroke.getPoint(i).getX(), (int)stroke.getPoint(i).getY(),
+							   (int)stroke.getPoint(i+1).getX(), (int)stroke.getPoint(i+1).getY());
 				}
 			}
-			drawnStrokes = new ArrayList<Stroke>();
 		}
 
+		// Draws all the strokes in "modifiedStrokes". Used for changing personas.
+		public void drawModifiedStrokes(Graphics g)
+		{
+			for(Stroke modifiedStroke : modifiedStrokes)
+			{
+				g.setColor(modifiedStroke.getColor());
+				for(int i = 0; i < modifiedStroke.getSize()-1; i++)
+				{
+					g.drawLine((int)modifiedStroke.getPoint(i).getX(), (int)modifiedStroke.getPoint(i).getY(),
+							   (int)modifiedStroke.getPoint(i+1).getX(), (int)modifiedStroke.getPoint(i+1).getY());
+				}
+			}
+			modifiedStrokes = new ArrayList<Stroke>();
+		}
+
+		// Clears all strokes in the window
 		public void clearPaintWindow()
 		{
-			// this clears all strokes but keeps the current color selected
 			strokes = new ArrayList<Stroke>();
 			strokes.add(new Stroke(curr_color));
 			current_stroke = 0;
+			modifiedStrokes = new ArrayList<Stroke>();
 			this.repaint();
 		}
+	}
+	
+	// Prints an analysis window with all of the features
+	public void printAnalysis()
+	{
+		// Set up window
+		analyzeWindow = new JFrame("Stroke Analysis");
+		analyzeWindow.setSize(500, 500);
+		analyzeWindow.setLocation(100, 100);
+		analyzeWindow.setResizable(false);
+		analyzeWindow.setVisible(true);
+		JPanel analyzePanel = new JPanel();
+		analyzeWindow.add(analyzePanel);
+		
+		// Ask what features the user wants to have analyzed
+		
+		// Mike's features
+		JCheckBox singleStrokeLengths = new JCheckBox("Single Stroke Lengths");
+		analyzePanel.add(singleStrokeLengths);
+		JCheckBox allStrokeLength = new JCheckBox("Total Stroke Length");
+		analyzePanel.add(allStrokeLength);
+		JCheckBox minStrokeLength = new JCheckBox("Minimum Stroke Length");
+		analyzePanel.add(minStrokeLength);
+		JCheckBox maxStrokeLength = new JCheckBox("Maximum Stroke Length");
+		analyzePanel.add(maxStrokeLength);
+		JCheckBox meanStrokeLength = new JCheckBox("Mean Stroke Length");
+		analyzePanel.add(meanStrokeLength);
+		JCheckBox endToEndLengths = new JCheckBox("End to End Lengths");
+		analyzePanel.add(endToEndLengths);
+		JCheckBox averageDistanceBetween = new JCheckBox("Average Distance Between Strokes");
+		analyzePanel.add(averageDistanceBetween);
+		
+		
+		// Analyze button at the bottom
+		analyzeButton = new JButton("Analyze");
+		analyzeButton.setBounds(210, 425, 100, 30);
+		JLayeredPane pane = analyzeWindow.getLayeredPane();
+		pane.add(analyzeButton, new Integer(1));
+		analyzeButton.addActionListener(new MenuListener());
+		
+		// Print out the analysis based on the user choices
+		
 	}
 
 	// Add a mouse listener that checks for mouse up, and if there is a mouse up, then clear past and current x and y
@@ -539,17 +493,12 @@ public class TracingInterface
 
 		public void mouseReleased(MouseEvent e)
 		{
-			// When mouse is released, clear curr_x, curr_y, past_x, and past_y
+			// When mouse is released, clear curr_x, curr_y
 			curr_x = 0;
 			curr_y = 0;
 
-			panel.printSingleStrokeFeatureAnalysis();
-			panel.printMultiStrokeFeatureAnalysis();
-
-			// update the stroke number (a stroke as defined by pen down to pen up)
 			strokes.add(new Stroke(curr_color));
 			current_stroke++;
-
 		}
 	}
 
@@ -562,13 +511,6 @@ public class TracingInterface
 			curr_x = e.getX();
 			curr_y = e.getY();
 			strokes.get(current_stroke).addPoint(new Point(curr_x, curr_y));
-/*			// print the current change in stroke to the screen
-			Stroke current = strokes.get(current_stroke);
-			// the x and y coordinates for the stroke
-			System.out.print("[x = " + current.getPoint(current.getSize()-1).getX() + ", y = " + current.getPoint(current.getSize()-1).getY() +  "]\t");
-			// the time from the beginning of the stroke to the last stroke made
-			System.out.println(current.getStrokeTimestamp(current.getSize()-1).getTime());
-*/
 			panel.repaint();
 		}
 
@@ -577,7 +519,6 @@ public class TracingInterface
 
 	public static void main(String[]args)
 	{
-		new TracingInterface();
+		TracingInterface trace = new TracingInterface();
 	}
 }
-
