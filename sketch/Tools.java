@@ -360,6 +360,337 @@ public class Tools
 	
 	}
 	
+	//Long's Features
+	
+	//Long's Feature 13 
+	//Aspect: [abs(45#4)] //? abs(4) ? // ? abs(4*5/4) ? I dunno
+	//note: May not be right... it is currently abs(rubine feature 4)
+	//original height / original width x new width = new height
+	//Ross Peterson
+	public static double aspect(ArrayList<Point> points)
+	{
+	double currXmax = Double.NEGATIVE_INFINITY;
+	double currXmin = Double.POSITIVE_INFINITY;
+	Point pXmax = points.get(0); //default initialization to make Eclipse happy
+	Point pXmin = points.get(0); //default initialization to make Eclipse happy
+
+	double currYmax = Double.NEGATIVE_INFINITY;
+	double currYmin = Double.POSITIVE_INFINITY;
+	Point pYmax = points.get(0); //default initialization to make Eclipse happy
+	Point pYmin = points.get(0); //default initialization to make Eclipse happy
+	
+	for(int i=0; i<points.size(); i++){
+		
+		if( points.get(i).getX() >= currXmax )
+			pXmax = points.get(i);	
+		
+		if( points.get(i).getX() <= currXmin )
+			pXmin = points.get(i);
+		
+		if( points.get(i).getY() >= currYmax )
+			pYmax = points.get(i);
+		
+		if( points.get(i).getY() <= currYmin )
+			pYmin = points.get(i);
+	}
+	
+	return Math.abs( Math.atan( ( pYmax.getY() - pYmin.getY() ) / 
+					  			( pXmax.getX() - pXmin.getX() ) ) );
+}
+	//14 Curviness ??
+	
+	//15 Total angle traversed / total length 
+	//?? Not sure on the total angle traversed
+	
+	//Long's feature 16 
+	//Density Metric 1 [8/5]
+	//Ross Peterson
+	public static double density1(ArrayList<Point> points)
+	{
+		//rubine feature 8 - Total Stroke Length
+		int i;
+		double totalLength = 0;
+		for(i = 0; i < points.size()-1; i++)
+		{
+			totalLength += getLength(points.get(i), points.get(i+1));
+		}
+		
+		Point p0 = points.get(0);
+		Point pNminus1 = points.get(points.size()-1);
+		
+		//rubine feature 5 - Distance between the first and last points
+		double distBetweenFirstAndLastPoints = Math.sqrt( Math.pow( (pNminus1.getX()- p0.getX()), 2) + 
+				   										  Math.pow( (pNminus1.getY()- p0.getY()), 2) );
+		
+		double density1 = totalLength / distBetweenFirstAndLastPoints;
+		return density1;
+		
+	}
+	
+	//Long's feature 17 
+	//Density Metric 2 [8/3]
+	//Ross Peterson
+	public static double density2(ArrayList<Point> points)
+	{
+		//rubine feature 8 - Total Stroke Length
+		double totalLength = 0;
+		for(int i = 0; i < points.size()-1; i++)
+		{
+			totalLength += getLength(points.get(i), points.get(i+1));
+		}
+		
+		//rubine feature 3 - Length of the Diagonal (Size of the bounding box)
+		double currXmax = Double.NEGATIVE_INFINITY;
+		double currXmin = Double.POSITIVE_INFINITY;
+		Point pXmax = points.get(0); //default initialization to make Eclipse happy
+		Point pXmin = points.get(0); //default initialization to make Eclipse happy
+
+		double currYmax = Double.NEGATIVE_INFINITY;
+		double currYmin = Double.POSITIVE_INFINITY;
+		Point pYmax = points.get(0); //default initialization to make Eclipse happy
+		Point pYmin = points.get(0); //default initialization to make Eclipse happy
+		
+		for(int i=0; i<points.size(); i++){
+			
+			if( points.get(i).getX() >= currXmax )
+				pXmax = points.get(i);	
+			
+			if( points.get(i).getX() <= currXmin )
+				pXmin = points.get(i);
+			
+			if( points.get(i).getY() >= currYmax )
+				pYmax = points.get(i);
+			
+			if( points.get(i).getY() <= currYmin )
+				pYmin = points.get(i);
+		}
+		
+		double lengthOfDiagonal = Math.sqrt( Math.pow( (pYmax.getY()- pYmin.getY()), 2) + 
+				   							 Math.pow( (pXmax.getX()- pXmin.getX()), 2) );
+		
+		double density2 = totalLength / lengthOfDiagonal;
+		return density2;
+	}
+	
+	//Long's feature 18
+	//Non-subjective openness [5/3]
+	//Ross Peterson
+	public static double openness(ArrayList<Point> points)
+	{
+		
+		//Rubine feature 5 - Distance between the first and last poitns
+		Point p0 = points.get(0);
+		Point pNminus1 = points.get(points.size()-1);
+		
+		double distBetweenFirstLastPoints = Math.sqrt( Math.pow( (pNminus1.getX()- p0.getX()), 2) + 
+						  					   Math.pow( (pNminus1.getY()- p0.getY()), 2) );
+		
+		//Rubine feature 3 - Length of the Diagonal (Size of the bounding box)
+		double currXmax = Double.NEGATIVE_INFINITY;
+		double currXmin = Double.POSITIVE_INFINITY;
+		Point pXmax = points.get(0); //default initialization to make Eclipse happy
+		Point pXmin = points.get(0); //default initialization to make Eclipse happy
+
+		double currYmax = Double.NEGATIVE_INFINITY;
+		double currYmin = Double.POSITIVE_INFINITY;
+		Point pYmax = points.get(0); //default initialization to make Eclipse happy
+		Point pYmin = points.get(0); //default initialization to make Eclipse happy
+		
+		for(int i=0; i<points.size(); i++){
+			
+			if( points.get(i).getX() >= currXmax )
+				pXmax = points.get(i);	
+			
+			if( points.get(i).getX() <= currXmin )
+				pXmin = points.get(i);
+			
+			if( points.get(i).getY() >= currYmax )
+				pYmax = points.get(i);
+			
+			if( points.get(i).getY() <= currYmin )
+				pYmin = points.get(i);
+		}
+		
+		double lengthOfDiagonal = Math.sqrt( Math.pow( (pYmax.getY()- pYmin.getY()), 2) + 
+				   							 Math.pow( (pXmax.getX()- pXmin.getX()), 2) );
+		
+		double nonSubjectiveOpenness = distBetweenFirstLastPoints / lengthOfDiagonal;
+		return nonSubjectiveOpenness;
+	}
+	
+	//Long's feature 19
+	//Area of the Bounding Box
+	//Ross Peterson
+	public static double areaOfBoundingBox(ArrayList<Point> points)
+	{
+		double currXmax = Double.NEGATIVE_INFINITY;
+		double currXmin = Double.POSITIVE_INFINITY;
+		Point pXmax = points.get(0); //default initialization to make Eclipse happy
+		Point pXmin = points.get(0); //default initialization to make Eclipse happy
+
+		double currYmax = Double.NEGATIVE_INFINITY;
+		double currYmin = Double.POSITIVE_INFINITY;
+		Point pYmax = points.get(0); //default initialization to make Eclipse happy
+		Point pYmin = points.get(0); //default initialization to make Eclipse happy
+		
+		for(int i=0; i<points.size(); i++){
+			
+			if( points.get(i).getX() >= currXmax )
+				pXmax = points.get(i);	
+			
+			if( points.get(i).getX() <= currXmin )
+				pXmin = points.get(i);
+			
+			if( points.get(i).getY() >= currYmax )
+				pYmax = points.get(i);
+			
+			if( points.get(i).getY() <= currYmin )
+				pYmin = points.get(i);
+		}
+		
+		double width  = pXmax.getX() - pXmin.getY();
+		double height = pYmax.getY() - pYmin.getY();
+		
+		double area = width * height;
+		return area;	
+	}
+	
+	//Long's feature 20
+	//Log(area)
+	//Ross Peterson
+	public static double logAreaOfBoundingbox(ArrayList<Point> points)
+	{
+		double currXmax = Double.NEGATIVE_INFINITY;
+		double currXmin = Double.POSITIVE_INFINITY;
+		Point pXmax = points.get(0); //default initialization to make Eclipse happy
+		Point pXmin = points.get(0); //default initialization to make Eclipse happy
+
+		double currYmax = Double.NEGATIVE_INFINITY;
+		double currYmin = Double.POSITIVE_INFINITY;
+		Point pYmax = points.get(0); //default initialization to make Eclipse happy
+		Point pYmin = points.get(0); //default initialization to make Eclipse happy
+		
+		for(int i=0; i<points.size(); i++){
+			
+			if( points.get(i).getX() >= currXmax )
+				pXmax = points.get(i);	
+			
+			if( points.get(i).getX() <= currXmin )
+				pXmin = points.get(i);
+			
+			if( points.get(i).getY() >= currYmax )
+				pYmax = points.get(i);
+			
+			if( points.get(i).getY() <= currYmin )
+				pYmin = points.get(i);
+		}
+		
+		double width  = pXmax.getX() - pXmin.getY();
+		double height = pYmax.getY() - pYmin.getY();
+		
+		double area = width * height;
+		return Math.log10(area);
+	}
+	
+	//Long's feature 21
+	//total angle/totalAbsAngle  [9/10]
+	//Ross Peterson
+	public static double totalAngleOverAbsAngle(ArrayList<Point> points)
+	{
+		//Rubine Feature 9
+		//total angle
+		//could be wrong
+		double totalRotationalChange = 0;
+		for(int i = points.size()-2; i > 1; i--){
+
+			Point p 	  = points.get(i);
+			Point pMinus1 = points.get(i-1);
+			Point pMinus2 = points.get(i-2);
+			
+			totalRotationalChange += Math.atan(
+					(
+					( (p.getX()       - pMinus1.getX()) * (pMinus1.getY() - pMinus2.getY()) ) *
+					( (pMinus1.getX() - pMinus2.getX()) * (p.getY()       - pMinus1.getY())   ) 
+					)/(
+					( (p.getX()-pMinus1.getX()) * (pMinus1.getX()-pMinus2.getX()) ) +
+					( (p.getY()-pMinus1.getY()) * (pMinus1.getY()-pMinus2.getY()) ) 
+					)
+				    );
+		}
+		
+		//Rubine Feature 10
+		//total absolute angle
+		double absTotalRotationalChange = 0;
+		for(int i = points.size()-2; i > 1; i--){
+
+			Point p 	  = points.get(i);
+			Point pMinus1 = points.get(i-1);
+			Point pMinus2 = points.get(i-2);
+			
+			absTotalRotationalChange += Math.abs(Math.atan(
+					(
+					( (p.getX()       - pMinus1.getX()) * (pMinus1.getY() - pMinus2.getY()) ) *
+					( (pMinus1.getX() - pMinus2.getX()) * (p.getY()       - pMinus1.getY())   ) 
+					)/(
+					( (p.getX()-pMinus1.getX()) * (pMinus1.getX()-pMinus2.getX()) ) +
+					( (p.getY()-pMinus1.getY()) * (pMinus1.getY()-pMinus2.getY()) ) 
+					)
+				    ));
+		}
+		return totalRotationalChange / absTotalRotationalChange;
+		
+	}
+	
+	//Long's feature 22
+	//log of Total Length
+	//Ross Peterson
+	public static double logTotalLength(ArrayList<Point> points)
+	{
+		int i;
+		double totalLength = 0;
+		for(i = 0; i < points.size()-1; i++)
+		{
+			totalLength += getLength(points.get(i), points.get(i+1));
+		}
+		return Math.log10(totalLength);
+	}
+	
+	//Long's feature 23
+	//log of aspect
+	//probably wrong until we know how to measure aspect
+	//aspect is currently the abs(angleOfdiagonal) // aba(4)
+	//Ross Peterson
+	public static double logCurviness(ArrayList<Point> points)
+	{
+	double currXmax = Double.NEGATIVE_INFINITY;
+	double currXmin = Double.POSITIVE_INFINITY;
+	Point pXmax = points.get(0); //default initialization to make Eclipse happy
+	Point pXmin = points.get(0); //default initialization to make Eclipse happy
+
+	double currYmax = Double.NEGATIVE_INFINITY;
+	double currYmin = Double.POSITIVE_INFINITY;
+	Point pYmax = points.get(0); //default initialization to make Eclipse happy
+	Point pYmin = points.get(0); //default initialization to make Eclipse happy
+	
+	for(int i=0; i<points.size(); i++){
+		
+		if( points.get(i).getX() >= currXmax )
+			pXmax = points.get(i);	
+		
+		if( points.get(i).getX() <= currXmin )
+			pXmin = points.get(i);
+		
+		if( points.get(i).getY() >= currYmax )
+			pYmax = points.get(i);
+		
+		if( points.get(i).getY() <= currYmin )
+			pYmin = points.get(i);
+	}
+	
+	return Math.log10( Math.abs( Math.atan( ( pYmax.getY() - pYmin.getY() ) / 
+					  		   ( pXmax.getX() - pXmin.getX() ) ) ) );
+	}
+	
 	//gets the distance between two points
 	//Mike Chenault
 	public static double getLength(Point p1, Point p2)
@@ -367,6 +698,8 @@ public class Tools
 		return Math.sqrt(Math.pow((double)Math.abs(p2.getX()-p1.getX()), 2.0) +
 				Math.pow((double)Math.abs(p2.getY()-p1.getY()), 2.0));
 	}
+	
+	
 	
 	//sqrt((x2-x1)^2 + (y2-y1)^2)
 	//Mike Chenault
@@ -427,7 +760,7 @@ public class Tools
 		}
 		return maxLength;
 	}
-
+	
 	//Mike Chenuault
 	public static double meanStrokeLength(ArrayList<Stroke> myStrokes)
 	{
