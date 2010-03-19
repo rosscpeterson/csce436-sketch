@@ -35,8 +35,7 @@ public class TracingInterface
 	private static Date initialApplicationTimeStamp;
 
 	// Member variables
-	private JFrame window;
-	private JFrame analyzeWindow;
+	private JFrame window, analyzeWindow, printWindow;
 	private JMenuBar menuBar;
 	private JMenu file;
 	private JMenuItem clear, quit;
@@ -160,11 +159,12 @@ public class TracingInterface
 			else if (e.getSource() == clear)
 				panel.clearPaintWindow();
 			else if (e.getSource() == analyzeStroke)
-				printAnalysis();
+				chooseAnalysis();
 			else if (e.getSource() == analyzeButton)
 			{
 				analyzeWindow.setVisible(false);
-				// Print out the analysis in a new window possibly
+				printAnalysis();
+				
 			} else if (e.getSource() == selectAll)
 			{
 				// Check All the boxes
@@ -530,8 +530,8 @@ public class TracingInterface
 		}
 	}
 	
-	// Prints an analysis window with all of the features
-	public void printAnalysis()
+	// Lets the user choose their analysis options
+	public void chooseAnalysis()
 	{
 		// Set up window
 		analyzeWindow = new JFrame("Stroke Analysis");
@@ -636,9 +636,24 @@ public class TracingInterface
 		selectAll.setBounds(275, 590, 200, 100);
 		pane.add(selectAll, new Integer(1));
 		selectAll.addActionListener(new MenuListener());
+	}
+	
+	// Prints the chosen analysis
+	public void printAnalysis()
+	{
+		printWindow = new JFrame("Stroke Analysis");
+		printWindow.setSize(500, 700);
+		printWindow.setLocation(100, 50);
+		printWindow.setResizable(false);
+		printWindow.setVisible(true);
 		
-		// Print out the analysis based on the user choices
-		
+		analyzeWindow.setLayout(new GridLayout(1, 2));
+		JPanel leftPanel = new JPanel();
+		leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
+		analyzeWindow.add(leftPanel);
+		JPanel rightPanel = new JPanel();
+		rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
+		analyzeWindow.add(rightPanel);
 	}
 
 	// Add a mouse listener that checks for mouse up, and if there is a mouse up, then clear past and current x and y

@@ -2,34 +2,28 @@
 //CSCE 436
 //Stroke.java
 
-//package sketch;
-
 import java.util.ArrayList;
-import java.util.Date;
 import java.awt.Point;
 import java.awt.Color;
 
 public class Stroke
 {
 	private ArrayList<Point> points;
-
-	// Change to milliseconds
-	private ArrayList<Date> timestamps;
+	private ArrayList<Long> timestamps;
 	private Color color;
-	private Date begin_date, end_date;
 
 	// Constructor
 	Stroke()
 	{
 		points = new ArrayList<Point>();
-		timestamps = new ArrayList<Date>();
+		timestamps = new ArrayList<Long>();
 		color = Color.black;
 	}
 
 	Stroke(Color c)
 	{
 		points = new ArrayList<Point>();
-		timestamps = new ArrayList<Date>();
+		timestamps = new ArrayList<Long>();
 		color = c;
 	}
 
@@ -37,16 +31,12 @@ public class Stroke
 	public void addPoint(Point pt)
 	{
 		points.add(pt);
-		addTimestamp(new Date());
 	}
 
 	// Adds a timestamp
-	public void addTimestamp(Date dt)
+	public void addTimestamp(long time)
 	{
-		if(timestamps.size()==0)
-			begin_date = dt;
-		end_date = dt;
-		timestamps.add(dt);
+		timestamps.add(new Long(time));
 	}
 
 	// Gets a point at the index
@@ -62,39 +52,15 @@ public class Stroke
 	}
 
 	// Gets a timestamp at the index
-	public Date getTimestamp(int index)
+	public long getTimestamp(int index)
 	{
 		return timestamps.get(index);
 	}
 
-	// Gets a timestamp at the index
-	public Date getStrokeTimestamp(int index)
+	// Gets the stroke duration in milliseconds
+	public long getStrokeDuration()
 	{
-		return new Date(timestamps.get(index).getTime() - begin_date.getTime());
-	}
-
-	// Gets the beginning date timestamp
-	public Date getBeginTimestamp()
-	{
-		return begin_date;
-	}
-
-	// Gets the end date timestamp
-	public Date getEndTimestamp()
-	{
-		return end_date;
-	}
-
-	// Gets the stroke duration in a Date format
-	public Date getStrokeDuration()
-	{
-		return new Date(end_date.getTime() - begin_date.getTime());
-	}
-
-	// Gets the stroke duration in long format (milliseconds)
-	public long getStrokeDurationInMilliseconds()
-	{
-		return end_date.getTime() - begin_date.getTime();
+		return (long)(timestamps.get(timestamps.size() - 1) - timestamps.get(0));
 	}
 
 	// Sets the color of the stroke
@@ -115,6 +81,7 @@ public class Stroke
 		return points.size();
 	}
 
+	// toString method
 	public String toString()
 	{
 		String output = new String();
@@ -125,17 +92,14 @@ public class Stroke
 			output += ", y = ";
 			output += points.get(i).getY();
 			output += "]\t";
-			output += getStrokeTimestamp(i).getTime();
+			output += getTimestamp(i);
 			output += "\n";
 			
 			//Ross testing area
 			//output += " cosStartingAngle = " + Tools.cosStartingAngle(points);
 			//output += ",";
 			//output += " sinStartingAngle = " + Tools.sinStartingAngle(points);
-			
-			
 		}
-
 		return output;
 	}
 }
