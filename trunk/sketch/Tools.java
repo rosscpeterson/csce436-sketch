@@ -17,18 +17,6 @@ public class Tools
 	//cos(alpha)
 	//cosine of the starting angle of the stroke
 	//Ross Peterson
-	//fist attempt, I think it's wrong, but somebody smarter might want to look at it.
-	public static double cosStartingAngle(Point p1, Point p2)
-	{
-		return ( (p2.getX() - p1.getX())
-				/
-				Math.sqrt(  Math.pow( (p2.getY()- p1.getY()), 2) + Math.pow((p2.getX()- p1.getX()), 2) ) );
-	}
-	
-	//Rubine feature 1
-	//cos(alpha)
-	//cosine of the starting angle of the stroke
-	//Ross Peterson
 	public static double cosStartingAngle(ArrayList<Point> points)
 	{
 		int secondPointIndex = 2;
@@ -46,18 +34,6 @@ public class Tools
 	//sin(alpha)
 	//sine of the starting angle of the stroke
 	//Ross Peterson
-	//fist attempt, I think it's wrong, but somebody smarter might want to look at it.
-	public static double sinStartingAngle(Point p1, Point p2)
-	{	
-		return ( (p2.getY()*p1.getY())
-				/
-				Math.sqrt(  Math.pow( (p2.getY()- p1.getY()), 2) + Math.pow((p2.getX()- p1.getX()), 2) ) );
-	}
-	
-	//Rubine feature 2
-	//sin(alpha)
-	//sine of the starting angle of the stroke
-	//Ross Peterson
 	public static double sinStartingAngle(ArrayList<Point> points)
 	{	
 		int secondPointIndex = 2;
@@ -66,7 +42,7 @@ public class Tools
 		Point p2 = points.get(secondPointIndex);
 		Point p1 = points.get(firstPointIndex);
 		
-		return ( (p2.getY()*p1.getY())
+		return ( (p2.getY() - p1.getY()) //FLAG used to be a '*' instead of '-'
 				/
 				Math.sqrt(  Math.pow( (p2.getY() - p1.getY()), 2) + 
 							Math.pow( (p2.getX() - p1.getX()), 2) ) );
@@ -167,7 +143,7 @@ public class Tools
 		Point p0 = points.get(0);
 		Point pN = points.get(points.size());
 		
-		return ( (pN.getX() * p0.getX()) / strokeDistance(points) );
+		return ( (pN.getX() - p0.getX()) / strokeDistance(points) ); //FLAG - used to be a '*' instead of a '-'
 	}
 	
 	//Rubine feature 7
@@ -178,7 +154,7 @@ public class Tools
 		Point p0 = points.get(0);
 		Point pN = points.get(points.size());	
 		
-		return ( (pN.getY() * p0.getY()) / strokeDistance(points) );
+		return ( (pN.getY() - p0.getY()) / strokeDistance(points) ); //FLAG - used to be a '*' instead of a '-'
 	}
 	
 	//Rubine feature 8
@@ -397,7 +373,51 @@ public class Tools
 	return Math.abs( Math.atan( ( pYmax.getY() - pYmin.getY() ) / 
 					  			( pXmax.getX() - pXmin.getX() ) ) );
 }
-	//14 Curviness ??
+	//Long's Feature 14 
+	//Curviness (curvature)
+	//(compute the change of angle of the line between each point and sum the angles together)
+	//could be (probably) wrong
+	//Ross Peterson
+	public static double curvature(ArrayList<Point> points)
+	{
+		//Rubine feature 6
+		//cos(Beta) 
+		//Ross Peterson
+		
+		//double cosBeta = ( (pN.getX() - p0.getX()) / strokeDistance(points) ); //FLAG - used to be a '*' instead of a '-'
+		
+		//Rubine feature 7
+		//sin(Beta)
+		//Ross Peterson
+			
+		//double sinBeta = ( (pN.getY() - p0.getY()) / strokeDistance(points) ); //FLAG - used to be a '*' instead of a '-'
+	
+		double totalCosAngle = 0;
+		double totalSinAngle = 0;
+		
+		for(int i=1; i<points.size(); i = i+4){
+			Point p3 = points.get(i);
+			Point p2 = points.get(i-1);
+			Point p1 = points.get(i-2);
+			Point p0 = points.get(i-3);
+			
+			double cosAngle1 = ( (p3.getX() - p2.getX()) / strokeDistance(points) );
+			double cosAngle0 = ( (p1.getX() - p0.getX()) / strokeDistance(points) );
+			
+			double cosDifference = cosAngle1 - cosAngle0;
+			
+			double sinAngle1 = ( (p3.getY() - p2.getY()) / strokeDistance(points) );
+			double sinAngle0 = ( (p1.getY() - p0.getY()) / strokeDistance(points) );
+			
+			double sinDifference = sinAngle1 - sinAngle0;
+			
+			totalCosAngle += cosDifference;
+			totalSinAngle += sinDifference;
+		}
+			
+		return totalCosAngle;
+		//return totalSinAngle;
+	}
 	
 	//15 Total angle traversed / total length 
 	//?? Not sure on the total angle traversed
