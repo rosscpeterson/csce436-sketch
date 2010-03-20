@@ -3,6 +3,7 @@
 // TracingInterface.java
 
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -28,7 +29,6 @@ import java.awt.Graphics2D;
 import java.awt.BasicStroke;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 public class TracingInterface
 {
@@ -37,7 +37,6 @@ public class TracingInterface
 	public final static int WINDOW_LOCATION_Y = 25;
 	public final static int WINDOW_SIZE_X = 700;
 	public final static int WINDOW_SIZE_Y = 700;
-	private static Date initialApplicationTimeStamp;
 
 	// Member variables
 	private JFrame window, analyzeWindow, printWindow;
@@ -48,15 +47,17 @@ public class TracingInterface
 	private JMenuItem blue, black, red, green, yellow, orange, magenta;
 	private JMenu analyze;
 	private JMenuItem analyzeStroke;
-	private JButton analyzeButton;
+	private JButton analyzeButton, singleButton;
 	private JCheckBox selectAll;
+	private JLabel titleLabel;
+	private JTextArea leftText, rightText;
 	private PaintWindow panel;
 	private int curr_x;
 	private int curr_y;
 	private Color curr_color;
 	private ArrayList<Stroke> strokes;
 	private ArrayList<Stroke> modifiedStrokes;
-	private int current_stroke;
+	private int current_stroke, analysis_index;
 	
 	// Checkboxes
 	JCheckBox singleStrokeLengths, allStrokeLength, minStrokeLength, maxStrokeLength,
@@ -77,10 +78,7 @@ public class TracingInterface
 		strokes = new ArrayList<Stroke>();
 		strokes.add(new Stroke(curr_color));
 		modifiedStrokes = new ArrayList<Stroke>();
-		current_stroke = 0;
-
-		// Set up initial date for the application
-		initialApplicationTimeStamp = new Date();
+		current_stroke = analysis_index = 0;
 
 		// Set up the window
 		window = new JFrame("Tracing Interface");
@@ -168,9 +166,20 @@ public class TracingInterface
 			else if (e.getSource() == analyzeButton)
 			{
 				analyzeWindow.setVisible(false);
+				analysis_index = 0;
 				printAnalysis();
 				
-			} else if (e.getSource() == selectAll)
+			} else if (e.getSource() == singleButton)
+			{
+				if (analysis_index < strokes.size() - 1)
+				{
+					printSingleAnalysis(analysis_index);
+					analysis_index++;
+				} else
+				{
+					printWindow.setVisible(false);
+				}
+		    }else if (e.getSource() == selectAll)
 			{
 				// Check All the boxes
 				if (selectAll.isSelected())
@@ -653,11 +662,13 @@ public class TracingInterface
 		
 		printWindow.setLayout(new GridLayout(1, 2));
 		JPanel leftPanel = new JPanel();
-		JTextArea leftText = new JTextArea();
+		leftText = new JTextArea();
+		leftText.setEditable(false);
 		leftPanel.add(leftText);
 		printWindow.add(leftPanel);
 		JPanel rightPanel = new JPanel();
-		JTextArea rightText = new JTextArea();
+		rightText = new JTextArea();
+		rightText.setEditable(false);
 		rightPanel.add(rightText);
 		printWindow.add(rightPanel);
 		
@@ -665,11 +676,11 @@ public class TracingInterface
 		Font largeFont = new Font("Verdana", Font.PLAIN, 20);
 		
 		// Show multiple stroke Analysis first
-		JLabel multiple = new JLabel("Multi-Stroke Analysis");
-		multiple.setFont(largeFont);
+		titleLabel = new JLabel("Multi-Stroke Analysis");
+		titleLabel.setFont(largeFont);
 		JLayeredPane lp = printWindow.getLayeredPane();
-		multiple.setBounds(175, -20, 250, 100);
-		lp.add(multiple, new Integer(1));
+		titleLabel.setBounds(175, -20, 350, 100);
+		lp.add(titleLabel, new Integer(1));
 		
 		// Formatting
 		DecimalFormat myFormat = new DecimalFormat("###.##");
@@ -698,6 +709,79 @@ public class TracingInterface
 		// Average Distance Between Strokes
 		if (averageDistanceBetween.isSelected())
 			leftText.append("Average Distance Between Strokes: " + myFormat.format(Tools.avgDistBetweenStrokes(strokes)) + "\n");
+		
+		// Move to single analysis
+		ImageIcon icon = new ImageIcon("arrow.gif");
+		singleButton = new JButton(icon);
+		singleButton.setBounds(500, 615, 61, 48);
+		JLayeredPane pane = printWindow.getLayeredPane();
+		pane.add(singleButton, new Integer(1));
+		singleButton.addActionListener(new MenuListener());
+	}
+	
+	// Print single analysis for each stroke
+	public void printSingleAnalysis(int index)
+	{
+		titleLabel.setBounds(125, -20, 350, 100);
+		titleLabel.setText("Single Stroke Analysis: Stroke " + (index+1));
+		leftText.setText("\n\n\n");
+		rightText.setText("\n\n\n");
+		DecimalFormat myFormat = new DecimalFormat("###.##");
+		
+		// Single analysis
+		if(singleStrokeLengths.isSelected())
+			leftText.append("Single Stroke Length: " + myFormat.format(Tools.singleStrokeLength(strokes.get(index))) + "\n");
+		if (cosStartingAngle.isSelected())
+			leftText.append("Cosine of Starting Angle: " + myFormat.format(Tools.cosStartingAngle(strokes.get(index))) + "\n");
+		if (sineStartingAngle.isSelected())
+			leftText.append("Sine of Starting Angle: " + myFormat.format(Tools.sinStartingAngle(strokes.get(index))) + "\n");
+		if (lengthOfDiagonal.isSelected())
+			leftText.append("Length of Diagonal: " + myFormat.format(Tools.lengthOfDiagonal(strokes.get(index))) + "\n");
+		if (angleOfDiagonal.isSelected())
+			leftText.append("Angle of Diagonal: " + myFormat.format(Tools.angleOfDiagonal(strokes.get(index))) + "\n");
+		
+		// Possibly duplicated
+		if (strokeDistance.isSelected())
+			leftText.append("Stroke Distance: " + myFormat.format(Tools.strokeDistance(strokes.get(index))) + "\n");
+		
+		if (cosEndingAngle.isSelected())
+			leftText.append("Cosine of Ending Angle: " + myFormat.format(Tools.cosEndingAngle(strokes.get(index))) + "\n");
+		if (sinEndingAngle.isSelected())
+			leftText.append("Sine of Ending Angle: " + myFormat.format(Tools.sinEndingAngle(strokes.get(index))) + "\n");
+		if (totalRotationalChange.isSelected())
+			leftText.append("Total Rotational Change: " + myFormat.format(Tools.totalRotationalChange(strokes.get(index))) + "\n");
+		if (totalAbsoluteRotation.isSelected())
+			leftText.append("Total Absolute Rotation: " + myFormat.format(Tools.absoluteTotalRotationalChange(strokes.get(index))) + "\n");
+		if (smoothness.isSelected())
+			leftText.append("Smoothness: " + myFormat.format(Tools.smoothness(strokes.get(index))) + "\n");
+		if (maximumSpeedSquared.isSelected())
+			leftText.append("Maximum Speed Squared: " + myFormat.format(Tools.maximumSpeedSquared(strokes.get(index))) + "\n");
+		if (minimumSpeedSquared.isSelected())
+			leftText.append("Minimum Speed Squared: " + myFormat.format(Tools.minimumSpeedSquared(strokes.get(index))) + "\n");
+		if (averageSpeedSquared.isSelected())
+			leftText.append("Average Speed Squared: " + myFormat.format(Tools.averageSpeedSquared(strokes.get(index))) + "\n");
+		if (strokeTime.isSelected())
+			leftText.append("Stroke Time: " + myFormat.format(Tools.strokeTime(strokes.get(index))) + "\n");
+		if (aspect.isSelected())
+			leftText.append("Aspect: " + myFormat.format(Tools.aspect(strokes.get(index))) + "\n");
+		if (curvature.isSelected())
+			leftText.append("Curvature: " + myFormat.format(Tools.curvature(strokes.get(index))) + "\n");
+		if (density1.isSelected())
+			leftText.append("Density Metric 1: " + myFormat.format(Tools.density1(strokes.get(index))) + "\n");
+		if (density2.isSelected())
+			leftText.append("Density Metric 2: " + myFormat.format(Tools.density2(strokes.get(index))) + "\n");
+		if (openness.isSelected())
+			leftText.append("Openness: " + myFormat.format(Tools.openness(strokes.get(index))) + "\n");
+		if (areaOfBox.isSelected())
+			leftText.append("Area of Bounding Box: " + myFormat.format(Tools.areaOfBoundingBox(strokes.get(index))) + "\n");
+		if (logAreaOfBox.isSelected())
+			leftText.append("Log of Area of Bounding Box: " + myFormat.format(Tools.logAreaOfBoundingbox(strokes.get(index))) + "\n");
+		if (totalAngleOverAbsAngle.isSelected())
+			leftText.append("Total Angle / Absolute Angle: " + myFormat.format(Tools.totalAngleOverAbsAngle(strokes.get(index))) + "\n");
+		if (logTotalLength.isSelected())
+			leftText.append("Log of Total Length: " + myFormat.format(Tools.logTotalLength(strokes.get(index))) + "\n");
+		if (logOfCurviness.isSelected())
+			leftText.append("Log of Curviness: " + myFormat.format(Tools.logCurviness(strokes.get(index))) + "\n");
 	}
 
 	// Add a mouse listener that checks for mouse up, and if there is a mouse up, then clear past and current x and y
