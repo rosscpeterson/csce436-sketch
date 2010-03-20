@@ -924,6 +924,7 @@ public class Tools
 	}
 
 	/***	This code incorrectly mirrors vertically.  Why? I don't know!  ***/
+	/***   From Mike: Should now be fixed due to the helper function being fixed ***/
 	//Mirrors all strokes across a horizontal line
 	//Mike Chenault
 	public static ArrayList<Stroke> mirrorAllVertical(ArrayList<Stroke> strokes, int windowSize_Y)
@@ -942,7 +943,7 @@ public class Tools
 	public static ArrayList<Stroke> makeDashed(Stroke stroke)
 	{
 		ArrayList<Stroke> newStrokes = new ArrayList<Stroke>();
-		for(int i = 0; i < stroke.getPoints().size(); i+=2)
+		for(int i = 0; i < stroke.getPoints().size()-1; i+=2)
 		{
 			if(i+1 < stroke.getPoints().size())
 			{
