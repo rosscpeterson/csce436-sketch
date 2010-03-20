@@ -16,13 +16,13 @@ public class Tools
 	//cos(alpha)
 	//cosine of the starting angle of the stroke
 	//Ross Peterson
-	public static double cosStartingAngle(ArrayList<Point> points)
+	public static double cosStartingAngle(Stroke stroke)
 	{
 		int secondPointIndex = 2;
 		int firstPointIndex = 0;
 		
-		Point p2 = points.get(secondPointIndex);
-		Point p1 = points.get(firstPointIndex);
+		Point p2 = stroke.getPoint(secondPointIndex);
+		Point p1 = stroke.getPoint(firstPointIndex);
 		
 		return ( (p2.getX() - p1.getX())
 				/
@@ -33,13 +33,13 @@ public class Tools
 	//sin(alpha)
 	//sine of the starting angle of the stroke
 	//Ross Peterson
-	public static double sinStartingAngle(ArrayList<Point> points)
+	public static double sinStartingAngle(Stroke stroke)
 	{	
 		int secondPointIndex = 2;
 		int firstPointIndex = 0;
 		
-		Point p2 = points.get(secondPointIndex);
-		Point p1 = points.get(firstPointIndex);
+		Point p2 = stroke.getPoint(secondPointIndex);
+		Point p1 = stroke.getPoint(firstPointIndex);
 		
 		return ( (p2.getY() - p1.getY()) //FLAG used to be a '*' instead of '-'
 				/
@@ -51,31 +51,31 @@ public class Tools
 	//d
 	//length of the diagonal of the bounding box of the stroke
 	//Ross Peterson
-	public static double lengthOfDiagonal(ArrayList<Point> points){
+	public static double lengthOfDiagonal(Stroke stroke){
 		
 		double currXmax = Double.NEGATIVE_INFINITY;
 		double currXmin = Double.POSITIVE_INFINITY;
-		Point pXmax = points.get(0); //default initialization to make Eclipse happy
-		Point pXmin = points.get(0); //default initialization to make Eclipse happy
+		Point pXmax = stroke.getPoint(0); //default initialization to make Eclipse happy
+		Point pXmin = stroke.getPoint(0); //default initialization to make Eclipse happy
 
 		double currYmax = Double.NEGATIVE_INFINITY;
 		double currYmin = Double.POSITIVE_INFINITY;
-		Point pYmax = points.get(0); //default initialization to make Eclipse happy
-		Point pYmin = points.get(0); //default initialization to make Eclipse happy
+		Point pYmax = stroke.getPoint(0); //default initialization to make Eclipse happy
+		Point pYmin = stroke.getPoint(0); //default initialization to make Eclipse happy
 		
-		for(int i=0; i<points.size(); i++){
+		for(int i=0; i<stroke.getSize(); i++){
 			
-			if( points.get(i).getX() >= currXmax )
-				pXmax = points.get(i);	
+			if( stroke.getPoint(i).getX() >= currXmax )
+				pXmax = stroke.getPoint(i);	
 			
-			if( points.get(i).getX() <= currXmin )
-				pXmin = points.get(i);
+			if( stroke.getPoint(i).getX() <= currXmin )
+				pXmin = stroke.getPoint(i);
 			
-			if( points.get(i).getY() >= currYmax )
-				pYmax = points.get(i);
+			if( stroke.getPoint(i).getY() >= currYmax )
+				pYmax = stroke.getPoint(i);
 			
-			if( points.get(i).getY() <= currYmin )
-				pYmin = points.get(i);
+			if( stroke.getPoint(i).getY() <= currYmin )
+				pYmin = stroke.getPoint(i);
 		}
 		
 		return Math.sqrt( Math.pow( (pYmax.getY()- pYmin.getY()), 2) + 
@@ -85,31 +85,31 @@ public class Tools
 	//Rubine feature 4
 	//angle of the diagonal of the bounding box
 	//Ross Peterson
-	public static double angleOfDiagonal(ArrayList<Point> points){
+	public static double angleOfDiagonal(Stroke stroke){
 		
 		double currXmax = Double.NEGATIVE_INFINITY;
 		double currXmin = Double.POSITIVE_INFINITY;
-		Point pXmax = points.get(0); //default initialization to make Eclipse happy
-		Point pXmin = points.get(0); //default initialization to make Eclipse happy
+		Point pXmax = stroke.getPoint(0); //default initialization to make Eclipse happy
+		Point pXmin = stroke.getPoint(0); //default initialization to make Eclipse happy
 
 		double currYmax = Double.NEGATIVE_INFINITY;
 		double currYmin = Double.POSITIVE_INFINITY;
-		Point pYmax = points.get(0); //default initialization to make Eclipse happy
-		Point pYmin = points.get(0); //default initialization to make Eclipse happy
+		Point pYmax = stroke.getPoint(0); //default initialization to make Eclipse happy
+		Point pYmin = stroke.getPoint(0); //default initialization to make Eclipse happy
 		
-		for(int i=0; i<points.size(); i++){
+		for(int i=0; i<stroke.getSize(); i++){
 			
-			if( points.get(i).getX() >= currXmax )
-				pXmax = points.get(i);	
+			if( stroke.getPoint(i).getX() >= currXmax )
+				pXmax = stroke.getPoint(i);	
 			
-			if( points.get(i).getX() <= currXmin )
-				pXmin = points.get(i);
+			if( stroke.getPoint(i).getX() <= currXmin )
+				pXmin = stroke.getPoint(i);
 			
-			if( points.get(i).getY() >= currYmax )
-				pYmax = points.get(i);
+			if( stroke.getPoint(i).getY() >= currYmax )
+				pYmax = stroke.getPoint(i);
 			
-			if( points.get(i).getY() <= currYmin )
-				pYmin = points.get(i);
+			if( stroke.getPoint(i).getY() <= currYmin )
+				pYmin = stroke.getPoint(i);
 		}
 		
 		return Math.atan( ( pYmax.getY() - pYmin.getY() ) / 
@@ -120,10 +120,10 @@ public class Tools
 	//distance between the start and end point of the stroke
 	//Ross Peterson
 	//note: Mike has done something similar to this...
-	public static double strokeDistance(ArrayList<Point> points)
+	public static double strokeDistance(Stroke stroke)
 	{
-		Point p0 = points.get(0);
-		Point pNminus1 = points.get(points.size()-1);
+		Point p0 = stroke.getPoint(0);
+		Point pNminus1 = stroke.getPoint(stroke.getSize()-1);
 		
 		return Math.sqrt( Math.pow( (pNminus1.getX()- p0.getX()), 2) + 
 						  Math.pow( (pNminus1.getY()- p0.getY()), 2) );
@@ -137,23 +137,23 @@ public class Tools
 	//Rubine feature 6
 	//cos(Beta) 
 	//Ross Peterson
-	public static double cosEndingAngle(ArrayList<Point> points)
+	public static double cosEndingAngle(Stroke stroke)
 	{
-		Point p0 = points.get(0);
-		Point pN = points.get(points.size());
+		Point p0 = stroke.getPoint(0);
+		Point pN = stroke.getPoint(stroke.getSize()-1);
 		
-		return ( (pN.getX() - p0.getX()) / strokeDistance(points) ); //FLAG - used to be a '*' instead of a '-'
+		return ( (pN.getX() - p0.getX()) / strokeDistance(stroke) ); //FLAG - used to be a '*' instead of a '-'
 	}
 	
 	//Rubine feature 7
 	//sin(Beta)
 	//Ross Peterson
-	public static double sinEndingAngle(ArrayList<Point> points)
+	public static double sinEndingAngle(Stroke stroke)
 	{
-		Point p0 = points.get(0);
-		Point pN = points.get(points.size());	
+		Point p0 = stroke.getPoint(0);
+		Point pN = stroke.getPoint(stroke.getSize()-1);	
 		
-		return ( (pN.getY() - p0.getY()) / strokeDistance(points) ); //FLAG - used to be a '*' instead of a '-'
+		return ( (pN.getY() - p0.getY()) / strokeDistance(stroke) ); //FLAG - used to be a '*' instead of a '-'
 	}
 	
 	//Rubine feature 8
@@ -166,14 +166,14 @@ public class Tools
 	//theta(p) = arctan[(Dxp*Dyp-1Dxp-1*Dyp)=(Dxp*Dxp-1 + Dyp * Dyp-1)]
 	//this could be wrong...
 	//Ross Peterson
-	public static double totalRotationalChange(ArrayList<Point> points){
+	public static double totalRotationalChange(Stroke stroke){
 		
 		double totalRotationalChange = 0;
-		for(int i = points.size()-2; i > 1; i--){
+		for(int i = stroke.getSize()-2; i > 1; i--){
 
-			Point p 	  = points.get(i);
-			Point pMinus1 = points.get(i-1);
-			Point pMinus2 = points.get(i-2);
+			Point p 	  = stroke.getPoint(i);
+			Point pMinus1 = stroke.getPoint(i-1);
+			Point pMinus2 = stroke.getPoint(i-2);
 			
 			totalRotationalChange += Math.atan(
 					(
@@ -191,14 +191,14 @@ public class Tools
 	//Rubine feature 10
 	//total absolute rotation change
 	//Ross Peterson
-	public static double absoluteTotalRotationalChange(ArrayList<Point> points){
+	public static double absoluteTotalRotationalChange(Stroke stroke){
 		
 		double totalRotationalChange = 0;
-		for(int i = points.size()-2; i > 1; i--){
+		for(int i = stroke.getSize()-2; i > 1; i--){
 
-			Point p 	  = points.get(i);
-			Point pMinus1 = points.get(i-1);
-			Point pMinus2 = points.get(i-2);
+			Point p 	  = stroke.getPoint(i);
+			Point pMinus1 = stroke.getPoint(i-1);
+			Point pMinus2 = stroke.getPoint(i-2);
 			
 			totalRotationalChange += Math.abs(Math.atan(
 					(
@@ -217,14 +217,14 @@ public class Tools
 	//smoothness of the stroke
 	//sum of the squared value of the absolute values of the angles between each stroke
 	//Ross Peterson
-	public static double smoothness(ArrayList<Point> points){
+	public static double smoothness(Stroke stroke){
 		
 		double totalRotationalChange = 0;
-		for(int i = points.size()-2; i > 1; i--){
+		for(int i = stroke.getSize()-2; i > 1; i--){
 
-			Point p 	  = points.get(i);
-			Point pMinus1 = points.get(i-1);
-			Point pMinus2 = points.get(i-2);
+			Point p 	  = stroke.getPoint(i);
+			Point pMinus1 = stroke.getPoint(i-1);
+			Point pMinus2 = stroke.getPoint(i-2);
 			
 			totalRotationalChange += Math.pow(
 										Math.abs(Math.atan(
@@ -244,19 +244,19 @@ public class Tools
 	//Rubine feature 12
 	//the squared value of the maximum speed reached
 	//essentially finds the maximum speed reached making the stroke
-	public static double maximumSpeedSquared(ArrayList<Point> points, ArrayList<Date> timestamps){
+	public static double maximumSpeedSquared(Stroke stroke){
 		
 		double maximumSpeed = Double.NEGATIVE_INFINITY;
 		
-		for(int i = 1; i < points.size()-2; i++){
+		for(int i = 1; i < stroke.getSize()-2; i++){
 			
-			Point p 	  = points.get(i);
-			Point pMinus1 = points.get(i-1);
+			Point p 	  = stroke.getPoint(i);
+			Point pMinus1 = stroke.getPoint(i-1);
 			
-			Date t       = timestamps.get(i);
-			Date tMinus1 = timestamps.get(i-1);
+			Long t       = stroke.getTimestamp(i);
+			Long tMinus1 = stroke.getTimestamp(i-1);
 			
-			double d = t.getTime() - tMinus1.getTime();
+			double d = t - tMinus1;
 			
 			double currSpeed  = (
 					   			 ( Math.pow((p.getX()-pMinus1.getX()),2) + Math.pow((p.getX()-pMinus1.getX()),2) ) /
@@ -270,19 +270,19 @@ public class Tools
 	
 	//minimum speed
 	//Ross Peterson
-	public static double minimumSpeedSquared(ArrayList<Point> points, ArrayList<Date> timestamps){
+	public static double minimumSpeedSquared(Stroke stroke){
 		
 		double minimumSpeed = Double.POSITIVE_INFINITY;
 		
-		for(int i = 1; i < points.size()-2; i++){
+		for(int i = 1; i < stroke.getSize()-2; i++){
 			
-			Point p 	  = points.get(i);
-			Point pMinus1 = points.get(i-1);
+			Point p 	  = stroke.getPoint(i);
+			Point pMinus1 = stroke.getPoint(i-1);
 			
-			Date t       = timestamps.get(i);
-			Date tMinus1 = timestamps.get(i-1);
+			Long t       = stroke.getTimestamp(i);
+			Long tMinus1 = stroke.getTimestamp(i-1);
 			
-			double d = t.getTime() - tMinus1.getTime();
+			double d = t - tMinus1;
 			
 			double currSpeed  = (
 					   			 ( Math.pow((p.getX()-pMinus1.getX()),2) + Math.pow((p.getX()-pMinus1.getX()),2) ) /
@@ -296,20 +296,20 @@ public class Tools
 
 	//average speed
 	//Ross Peterson
-	public static double averageSpeedSquared(ArrayList<Point> points, ArrayList<Date> timestamps){
+	public static double averageSpeedSquared(Stroke stroke){
 		
 		double averageSpeed = 0;
 		double totalSpeed = 0;
 		
-		for(int i = 1; i < points.size()-2; i++){
+		for(int i = 1; i < stroke.getSize()-2; i++){
 			
-			Point p 	  = points.get(i);
-			Point pMinus1 = points.get(i-1);
+			Point p 	  = stroke.getPoint(i);
+			Point pMinus1 = stroke.getPoint(i-1);
 			
-			Date t       = timestamps.get(i);
-			Date tMinus1 = timestamps.get(i-1);
+			Long t       = stroke.getTimestamp(i);
+			Long tMinus1 = stroke.getTimestamp(i-1);
 			
-			double d = t.getTime() - tMinus1.getTime();
+			double d = t - tMinus1;
 			
 			totalSpeed  += (
 					   			 ( Math.pow((p.getX()-pMinus1.getX()),2) + Math.pow((p.getX()-pMinus1.getX()),2) ) /
@@ -317,19 +317,19 @@ public class Tools
 					  			);
 			}
 			
-		averageSpeed = totalSpeed / points.size();	
+		averageSpeed = totalSpeed / stroke.getSize();	
 		return averageSpeed;
 	}
 	
 	//Rubine feature 13
 	//stroke time
 	//Ross Peterson
-	public static double strokeTime(ArrayList<Point> points, ArrayList<Date> timestamps){
+	public static double strokeTime(Stroke stroke){
 	
-	Date tNminus1 = timestamps.get(timestamps.size()-1);
-	Date t0 	  = timestamps.get(0);
+	Long tNminus1 = stroke.getTimestamp(stroke.getSize()-1);
+	Long t0 	  = stroke.getTimestamp(0);
 	
-	double strokeTime = tNminus1.getTime() - t0.getTime();
+	double strokeTime = tNminus1 - t0;
 	
 	return strokeTime;
 	
@@ -342,31 +342,31 @@ public class Tools
 	//note: May not be right... it is currently abs(rubine feature 4)
 	//original height / original width x new width = new height
 	//Ross Peterson
-	public static double aspect(ArrayList<Point> points)
+	public static double aspect(Stroke stroke)
 	{
 	double currXmax = Double.NEGATIVE_INFINITY;
 	double currXmin = Double.POSITIVE_INFINITY;
-	Point pXmax = points.get(0); //default initialization to make Eclipse happy
-	Point pXmin = points.get(0); //default initialization to make Eclipse happy
+	Point pXmax = stroke.getPoint(0); //default initialization to make Eclipse happy
+	Point pXmin = stroke.getPoint(0); //default initialization to make Eclipse happy
 
 	double currYmax = Double.NEGATIVE_INFINITY;
 	double currYmin = Double.POSITIVE_INFINITY;
-	Point pYmax = points.get(0); //default initialization to make Eclipse happy
-	Point pYmin = points.get(0); //default initialization to make Eclipse happy
+	Point pYmax = stroke.getPoint(0); //default initialization to make Eclipse happy
+	Point pYmin = stroke.getPoint(0); //default initialization to make Eclipse happy
 	
-	for(int i=0; i<points.size(); i++){
+	for(int i=0; i<stroke.getSize(); i++){
 		
-		if( points.get(i).getX() >= currXmax )
-			pXmax = points.get(i);	
+		if( stroke.getPoint(i).getX() >= currXmax )
+			pXmax = stroke.getPoint(i);	
 		
-		if( points.get(i).getX() <= currXmin )
-			pXmin = points.get(i);
+		if( stroke.getPoint(i).getX() <= currXmin )
+			pXmin = stroke.getPoint(i);
 		
-		if( points.get(i).getY() >= currYmax )
-			pYmax = points.get(i);
+		if( stroke.getPoint(i).getY() >= currYmax )
+			pYmax = stroke.getPoint(i);
 		
-		if( points.get(i).getY() <= currYmin )
-			pYmin = points.get(i);
+		if( stroke.getPoint(i).getY() <= currYmin )
+			pYmin = stroke.getPoint(i);
 	}
 	
 	return Math.abs( Math.atan( ( pYmax.getY() - pYmin.getY() ) / 
@@ -377,7 +377,7 @@ public class Tools
 	//(compute the change of angle of the line between each point and sum the angles together)
 	//could be (probably) wrong
 	//Ross Peterson
-	public static double curvature(ArrayList<Point> points)
+	public static double curvature(Stroke stroke)
 	{
 		//Rubine feature 6
 		//cos(Beta) 
@@ -394,19 +394,19 @@ public class Tools
 		double totalCosAngle = 0;
 		double totalSinAngle = 0;
 		
-		for(int i=1; i<points.size(); i = i+4){
-			Point p3 = points.get(i);
-			Point p2 = points.get(i-1);
-			Point p1 = points.get(i-2);
-			Point p0 = points.get(i-3);
+		for(int i=3; i<stroke.getSize(); i = i+4){
+			Point p3 = stroke.getPoint(i);
+			Point p2 = stroke.getPoint(i-1);
+			Point p1 = stroke.getPoint(i-2);
+			Point p0 = stroke.getPoint(i-3);
 			
-			double cosAngle1 = ( (p3.getX() - p2.getX()) / strokeDistance(points) );
-			double cosAngle0 = ( (p1.getX() - p0.getX()) / strokeDistance(points) );
+			double cosAngle1 = ( (p3.getX() - p2.getX()) / strokeDistance(stroke) );
+			double cosAngle0 = ( (p1.getX() - p0.getX()) / strokeDistance(stroke) );
 			
 			double cosDifference = cosAngle1 - cosAngle0;
 			
-			double sinAngle1 = ( (p3.getY() - p2.getY()) / strokeDistance(points) );
-			double sinAngle0 = ( (p1.getY() - p0.getY()) / strokeDistance(points) );
+			double sinAngle1 = ( (p3.getY() - p2.getY()) / strokeDistance(stroke) );
+			double sinAngle0 = ( (p1.getY() - p0.getY()) / strokeDistance(stroke) );
 			
 			double sinDifference = sinAngle1 - sinAngle0;
 			
@@ -424,18 +424,18 @@ public class Tools
 	//Long's feature 16 
 	//Density Metric 1 [8/5]
 	//Ross Peterson
-	public static double density1(ArrayList<Point> points)
+	public static double density1(Stroke stroke)
 	{
 		//rubine feature 8 - Total Stroke Length
 		int i;
 		double totalLength = 0;
-		for(i = 0; i < points.size()-1; i++)
+		for(i = 0; i < stroke.getSize()-1; i++)
 		{
-			totalLength += getLength(points.get(i), points.get(i+1));
+			totalLength += getLength(stroke.getPoint(i), stroke.getPoint(i+1));
 		}
 		
-		Point p0 = points.get(0);
-		Point pNminus1 = points.get(points.size()-1);
+		Point p0 = stroke.getPoint(0);
+		Point pNminus1 = stroke.getPoint(stroke.getSize()-1);
 		
 		//rubine feature 5 - Distance between the first and last points
 		double distBetweenFirstAndLastPoints = Math.sqrt( Math.pow( (pNminus1.getX()- p0.getX()), 2) + 
@@ -449,39 +449,39 @@ public class Tools
 	//Long's feature 17 
 	//Density Metric 2 [8/3]
 	//Ross Peterson
-	public static double density2(ArrayList<Point> points)
+	public static double density2(Stroke stroke)
 	{
 		//rubine feature 8 - Total Stroke Length
 		double totalLength = 0;
-		for(int i = 0; i < points.size()-1; i++)
+		for(int i = 0; i < stroke.getSize()-1; i++)
 		{
-			totalLength += getLength(points.get(i), points.get(i+1));
+			totalLength += getLength(stroke.getPoint(i), stroke.getPoint(i+1));
 		}
 		
 		//rubine feature 3 - Length of the Diagonal (Size of the bounding box)
 		double currXmax = Double.NEGATIVE_INFINITY;
 		double currXmin = Double.POSITIVE_INFINITY;
-		Point pXmax = points.get(0); //default initialization to make Eclipse happy
-		Point pXmin = points.get(0); //default initialization to make Eclipse happy
+		Point pXmax = stroke.getPoint(0); //default initialization to make Eclipse happy
+		Point pXmin = stroke.getPoint(0); //default initialization to make Eclipse happy
 
 		double currYmax = Double.NEGATIVE_INFINITY;
 		double currYmin = Double.POSITIVE_INFINITY;
-		Point pYmax = points.get(0); //default initialization to make Eclipse happy
-		Point pYmin = points.get(0); //default initialization to make Eclipse happy
+		Point pYmax = stroke.getPoint(0); //default initialization to make Eclipse happy
+		Point pYmin = stroke.getPoint(0); //default initialization to make Eclipse happy
 		
-		for(int i=0; i<points.size(); i++){
+		for(int i=0; i<stroke.getSize(); i++){
 			
-			if( points.get(i).getX() >= currXmax )
-				pXmax = points.get(i);	
+			if( stroke.getPoint(i).getX() >= currXmax )
+				pXmax = stroke.getPoint(i);	
 			
-			if( points.get(i).getX() <= currXmin )
-				pXmin = points.get(i);
+			if( stroke.getPoint(i).getX() <= currXmin )
+				pXmin = stroke.getPoint(i);
 			
-			if( points.get(i).getY() >= currYmax )
-				pYmax = points.get(i);
+			if( stroke.getPoint(i).getY() >= currYmax )
+				pYmax = stroke.getPoint(i);
 			
-			if( points.get(i).getY() <= currYmin )
-				pYmin = points.get(i);
+			if( stroke.getPoint(i).getY() <= currYmin )
+				pYmin = stroke.getPoint(i);
 		}
 		
 		double lengthOfDiagonal = Math.sqrt( Math.pow( (pYmax.getY()- pYmin.getY()), 2) + 
@@ -494,12 +494,12 @@ public class Tools
 	//Long's feature 18
 	//Non-subjective openness [5/3]
 	//Ross Peterson
-	public static double openness(ArrayList<Point> points)
+	public static double openness(Stroke stroke)
 	{
 		
 		//Rubine feature 5 - Distance between the first and last poitns
-		Point p0 = points.get(0);
-		Point pNminus1 = points.get(points.size()-1);
+		Point p0 = stroke.getPoint(0);
+		Point pNminus1 = stroke.getPoint(stroke.getSize()-1);
 		
 		double distBetweenFirstLastPoints = Math.sqrt( Math.pow( (pNminus1.getX()- p0.getX()), 2) + 
 						  					   Math.pow( (pNminus1.getY()- p0.getY()), 2) );
@@ -507,27 +507,27 @@ public class Tools
 		//Rubine feature 3 - Length of the Diagonal (Size of the bounding box)
 		double currXmax = Double.NEGATIVE_INFINITY;
 		double currXmin = Double.POSITIVE_INFINITY;
-		Point pXmax = points.get(0); //default initialization to make Eclipse happy
-		Point pXmin = points.get(0); //default initialization to make Eclipse happy
+		Point pXmax = stroke.getPoint(0); //default initialization to make Eclipse happy
+		Point pXmin = stroke.getPoint(0); //default initialization to make Eclipse happy
 
 		double currYmax = Double.NEGATIVE_INFINITY;
 		double currYmin = Double.POSITIVE_INFINITY;
-		Point pYmax = points.get(0); //default initialization to make Eclipse happy
-		Point pYmin = points.get(0); //default initialization to make Eclipse happy
+		Point pYmax = stroke.getPoint(0); //default initialization to make Eclipse happy
+		Point pYmin = stroke.getPoint(0); //default initialization to make Eclipse happy
 		
-		for(int i=0; i<points.size(); i++){
+		for(int i=0; i<stroke.getSize(); i++){
 			
-			if( points.get(i).getX() >= currXmax )
-				pXmax = points.get(i);	
+			if( stroke.getPoint(i).getX() >= currXmax )
+				pXmax = stroke.getPoint(i);	
 			
-			if( points.get(i).getX() <= currXmin )
-				pXmin = points.get(i);
+			if( stroke.getPoint(i).getX() <= currXmin )
+				pXmin = stroke.getPoint(i);
 			
-			if( points.get(i).getY() >= currYmax )
-				pYmax = points.get(i);
+			if( stroke.getPoint(i).getY() >= currYmax )
+				pYmax = stroke.getPoint(i);
 			
-			if( points.get(i).getY() <= currYmin )
-				pYmin = points.get(i);
+			if( stroke.getPoint(i).getY() <= currYmin )
+				pYmin = stroke.getPoint(i);
 		}
 		
 		double lengthOfDiagonal = Math.sqrt( Math.pow( (pYmax.getY()- pYmin.getY()), 2) + 
@@ -540,31 +540,31 @@ public class Tools
 	//Long's feature 19
 	//Area of the Bounding Box
 	//Ross Peterson
-	public static double areaOfBoundingBox(ArrayList<Point> points)
+	public static double areaOfBoundingBox(Stroke stroke)
 	{
 		double currXmax = Double.NEGATIVE_INFINITY;
 		double currXmin = Double.POSITIVE_INFINITY;
-		Point pXmax = points.get(0); //default initialization to make Eclipse happy
-		Point pXmin = points.get(0); //default initialization to make Eclipse happy
+		Point pXmax = stroke.getPoint(0); //default initialization to make Eclipse happy
+		Point pXmin = stroke.getPoint(0); //default initialization to make Eclipse happy
 
 		double currYmax = Double.NEGATIVE_INFINITY;
 		double currYmin = Double.POSITIVE_INFINITY;
-		Point pYmax = points.get(0); //default initialization to make Eclipse happy
-		Point pYmin = points.get(0); //default initialization to make Eclipse happy
+		Point pYmax = stroke.getPoint(0); //default initialization to make Eclipse happy
+		Point pYmin = stroke.getPoint(0); //default initialization to make Eclipse happy
 		
-		for(int i=0; i<points.size(); i++){
+		for(int i=0; i<stroke.getSize(); i++){
 			
-			if( points.get(i).getX() >= currXmax )
-				pXmax = points.get(i);	
+			if( stroke.getPoint(i).getX() >= currXmax )
+				pXmax = stroke.getPoint(i);	
 			
-			if( points.get(i).getX() <= currXmin )
-				pXmin = points.get(i);
+			if( stroke.getPoint(i).getX() <= currXmin )
+				pXmin = stroke.getPoint(i);
 			
-			if( points.get(i).getY() >= currYmax )
-				pYmax = points.get(i);
+			if( stroke.getPoint(i).getY() >= currYmax )
+				pYmax = stroke.getPoint(i);
 			
-			if( points.get(i).getY() <= currYmin )
-				pYmin = points.get(i);
+			if( stroke.getPoint(i).getY() <= currYmin )
+				pYmin = stroke.getPoint(i);
 		}
 		
 		double width  = pXmax.getX() - pXmin.getY();
@@ -577,31 +577,31 @@ public class Tools
 	//Long's feature 20
 	//Log(area)
 	//Ross Peterson
-	public static double logAreaOfBoundingbox(ArrayList<Point> points)
+	public static double logAreaOfBoundingbox(Stroke stroke)
 	{
 		double currXmax = Double.NEGATIVE_INFINITY;
 		double currXmin = Double.POSITIVE_INFINITY;
-		Point pXmax = points.get(0); //default initialization to make Eclipse happy
-		Point pXmin = points.get(0); //default initialization to make Eclipse happy
+		Point pXmax = stroke.getPoint(0); //default initialization to make Eclipse happy
+		Point pXmin = stroke.getPoint(0); //default initialization to make Eclipse happy
 
 		double currYmax = Double.NEGATIVE_INFINITY;
 		double currYmin = Double.POSITIVE_INFINITY;
-		Point pYmax = points.get(0); //default initialization to make Eclipse happy
-		Point pYmin = points.get(0); //default initialization to make Eclipse happy
+		Point pYmax = stroke.getPoint(0); //default initialization to make Eclipse happy
+		Point pYmin = stroke.getPoint(0); //default initialization to make Eclipse happy
 		
-		for(int i=0; i<points.size(); i++){
+		for(int i=0; i<stroke.getSize(); i++){
 			
-			if( points.get(i).getX() >= currXmax )
-				pXmax = points.get(i);	
+			if( stroke.getPoint(i).getX() >= currXmax )
+				pXmax = stroke.getPoint(i);	
 			
-			if( points.get(i).getX() <= currXmin )
-				pXmin = points.get(i);
+			if( stroke.getPoint(i).getX() <= currXmin )
+				pXmin = stroke.getPoint(i);
 			
-			if( points.get(i).getY() >= currYmax )
-				pYmax = points.get(i);
+			if( stroke.getPoint(i).getY() >= currYmax )
+				pYmax = stroke.getPoint(i);
 			
-			if( points.get(i).getY() <= currYmin )
-				pYmin = points.get(i);
+			if( stroke.getPoint(i).getY() <= currYmin )
+				pYmin = stroke.getPoint(i);
 		}
 		
 		double width  = pXmax.getX() - pXmin.getY();
@@ -614,17 +614,17 @@ public class Tools
 	//Long's feature 21
 	//total angle/totalAbsAngle  [9/10]
 	//Ross Peterson
-	public static double totalAngleOverAbsAngle(ArrayList<Point> points)
+	public static double totalAngleOverAbsAngle(Stroke stroke)
 	{
 		//Rubine Feature 9
 		//total angle
 		//could be wrong
 		double totalRotationalChange = 0;
-		for(int i = points.size()-2; i > 1; i--){
+		for(int i = stroke.getSize()-2; i > 1; i--){
 
-			Point p 	  = points.get(i);
-			Point pMinus1 = points.get(i-1);
-			Point pMinus2 = points.get(i-2);
+			Point p 	  = stroke.getPoint(i);
+			Point pMinus1 = stroke.getPoint(i-1);
+			Point pMinus2 = stroke.getPoint(i-2);
 			
 			totalRotationalChange += Math.atan(
 					(
@@ -640,11 +640,11 @@ public class Tools
 		//Rubine Feature 10
 		//total absolute angle
 		double absTotalRotationalChange = 0;
-		for(int i = points.size()-2; i > 1; i--){
+		for(int i = stroke.getSize()-2; i > 1; i--){
 
-			Point p 	  = points.get(i);
-			Point pMinus1 = points.get(i-1);
-			Point pMinus2 = points.get(i-2);
+			Point p 	  = stroke.getPoint(i);
+			Point pMinus1 = stroke.getPoint(i-1);
+			Point pMinus2 = stroke.getPoint(i-2);
 			
 			absTotalRotationalChange += Math.abs(Math.atan(
 					(
@@ -663,13 +663,13 @@ public class Tools
 	//Long's feature 22
 	//log of Total Length
 	//Ross Peterson
-	public static double logTotalLength(ArrayList<Point> points)
+	public static double logTotalLength(Stroke stroke)
 	{
 		int i;
 		double totalLength = 0;
-		for(i = 0; i < points.size()-1; i++)
+		for(i = 0; i < stroke.getSize()-1; i++)
 		{
-			totalLength += getLength(points.get(i), points.get(i+1));
+			totalLength += getLength(stroke.getPoint(i), stroke.getPoint(i+1));
 		}
 		return Math.log10(totalLength);
 	}
@@ -679,31 +679,31 @@ public class Tools
 	//probably wrong until we know how to measure aspect
 	//aspect is currently the abs(angleOfdiagonal) // aba(4)
 	//Ross Peterson
-	public static double logCurviness(ArrayList<Point> points)
+	public static double logCurviness(Stroke stroke)
 	{
 	double currXmax = Double.NEGATIVE_INFINITY;
 	double currXmin = Double.POSITIVE_INFINITY;
-	Point pXmax = points.get(0); //default initialization to make Eclipse happy
-	Point pXmin = points.get(0); //default initialization to make Eclipse happy
+	Point pXmax = stroke.getPoint(0); //default initialization to make Eclipse happy
+	Point pXmin = stroke.getPoint(0); //default initialization to make Eclipse happy
 
 	double currYmax = Double.NEGATIVE_INFINITY;
 	double currYmin = Double.POSITIVE_INFINITY;
-	Point pYmax = points.get(0); //default initialization to make Eclipse happy
-	Point pYmin = points.get(0); //default initialization to make Eclipse happy
+	Point pYmax = stroke.getPoint(0); //default initialization to make Eclipse happy
+	Point pYmin = stroke.getPoint(0); //default initialization to make Eclipse happy
 	
-	for(int i=0; i<points.size(); i++){
+	for(int i=0; i<stroke.getSize(); i++){
 		
-		if( points.get(i).getX() >= currXmax )
-			pXmax = points.get(i);	
+		if( stroke.getPoint(i).getX() >= currXmax )
+			pXmax = stroke.getPoint(i);	
 		
-		if( points.get(i).getX() <= currXmin )
-			pXmin = points.get(i);
+		if( stroke.getPoint(i).getX() <= currXmin )
+			pXmin = stroke.getPoint(i);
 		
-		if( points.get(i).getY() >= currYmax )
-			pYmax = points.get(i);
+		if( stroke.getPoint(i).getY() >= currYmax )
+			pYmax = stroke.getPoint(i);
 		
-		if( points.get(i).getY() <= currYmin )
-			pYmin = points.get(i);
+		if( stroke.getPoint(i).getY() <= currYmin )
+			pYmin = stroke.getPoint(i);
 	}
 	
 	return Math.log10( Math.abs( Math.atan( ( pYmax.getY() - pYmin.getY() ) / 
@@ -722,13 +722,13 @@ public class Tools
 	
 	//sqrt((x2-x1)^2 + (y2-y1)^2)
 	//Mike Chenault
-	public static double singleStrokeLength(ArrayList<Point> points)
+	public static double singleStrokeLength(Stroke stroke)
 	{
 		int i;
 		double totalLength = 0;
-		for(i = 0; i < points.size()-1; i++)
+		for(i = 0; i < stroke.getSize()-1; i++)
 		{
-			totalLength += getLength(points.get(i), points.get(i+1));
+			totalLength += getLength(stroke.getPoint(i), stroke.getPoint(i+1));
 		}
 		return totalLength;
 	}
@@ -741,7 +741,7 @@ public class Tools
 		double totalLength = 0;
 		for(i = 0; i < myStrokes.size() - 1; i++)
 		{
-			totalLength += singleStrokeLength(myStrokes.get(i).getPoints());
+			totalLength += singleStrokeLength(myStrokes.get(i));
 		}
 		return totalLength;
 	}
@@ -751,10 +751,10 @@ public class Tools
 	public static double minStrokeLength(ArrayList<Stroke> myStrokes)
 	{
 		int i;
-		double minLength = singleStrokeLength(myStrokes.get(0).getPoints());
+		double minLength = singleStrokeLength(myStrokes.get(0));
 		for(i = 1; i < myStrokes.size() - 1; i++)
 		{
-			double currStrokeLength = singleStrokeLength(myStrokes.get(i).getPoints());
+			double currStrokeLength = singleStrokeLength(myStrokes.get(i));
 			if(currStrokeLength < minLength)
 			{
 				minLength = currStrokeLength;
@@ -768,10 +768,10 @@ public class Tools
 	public static double maxStrokeLength(ArrayList<Stroke> myStrokes)
 	{
 		int i;
-		double maxLength = singleStrokeLength(myStrokes.get(0).getPoints());
+		double maxLength = singleStrokeLength(myStrokes.get(0));
 		for(i = 1; i < myStrokes.size() - 1; i++)
 		{
-			double currStrokeLength = singleStrokeLength(myStrokes.get(i).getPoints());
+			double currStrokeLength = singleStrokeLength(myStrokes.get(i));
 			if(currStrokeLength > maxLength)
 			{
 				maxLength = currStrokeLength;
@@ -788,9 +788,9 @@ public class Tools
 
 	//returns length from start point of stroke to end point of stroke
 	//Mike Chenault
-	public static double endToEndLength(ArrayList<Point> points)
+	public static double endToEndLength(Stroke stroke)
 	{
-		return getLength(points.get(points.size()-1), points.get(0));
+		return getLength(stroke.getPoint(stroke.getSize()-1), stroke.getPoint(0));
 	}
 
 	//Mike Chenault
