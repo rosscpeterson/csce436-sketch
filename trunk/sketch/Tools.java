@@ -896,6 +896,7 @@ public class Tools
 	}
 
 	/***	This code incorrectly mirrors vertically.  Why? I don't know!  ***/
+	/*** Fom Mike: I think I fixed it.  Changed getY to get X second line of loop ***/
 	//Mirrors a stroke across a horizontal line
 	//Mike Chenault
 	public static Stroke mirrorVerticalStroke(Stroke stroke, int windowSize_Y)
@@ -904,7 +905,7 @@ public class Tools
 		for(int i = 0; i < stroke.getPoints().size(); i++)
 		{
 			int diff = windowSize_Y - (int)stroke.getPoints().get(i).getY();
-			Point newPoint = new Point((int)stroke.getPoints().get(i).getY(), diff);
+			Point newPoint = new Point((int)stroke.getPoints().get(i).getX(), diff);
 			newStroke.addPoint(newPoint);
 		}
 		return newStroke;
