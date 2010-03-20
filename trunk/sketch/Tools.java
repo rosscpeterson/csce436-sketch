@@ -739,7 +739,7 @@ public class Tools
 	{
 		int i;
 		double totalLength = 0;
-		for(i = 0; i < myStrokes.size(); i++)
+		for(i = 0; i < myStrokes.size() - 1; i++)
 		{
 			totalLength += singleStrokeLength(myStrokes.get(i).getPoints());
 		}
@@ -752,7 +752,7 @@ public class Tools
 	{
 		int i;
 		double minLength = singleStrokeLength(myStrokes.get(0).getPoints());
-		for(i = 1; i < myStrokes.size(); i++)
+		for(i = 1; i < myStrokes.size() - 1; i++)
 		{
 			double currStrokeLength = singleStrokeLength(myStrokes.get(i).getPoints());
 			if(currStrokeLength < minLength)
@@ -769,7 +769,7 @@ public class Tools
 	{
 		int i;
 		double maxLength = singleStrokeLength(myStrokes.get(0).getPoints());
-		for(i = 1; i < myStrokes.size(); i++)
+		for(i = 1; i < myStrokes.size() - 1; i++)
 		{
 			double currStrokeLength = singleStrokeLength(myStrokes.get(i).getPoints());
 			if(currStrokeLength > maxLength)
@@ -796,7 +796,7 @@ public class Tools
 	//Mike Chenault
 	public static int numStrokes(ArrayList<Stroke> myStrokes)
 	{
-		return myStrokes.size();
+		return myStrokes.size() - 1;
 	}
 
 	//returns the average straight line distance between the strokes

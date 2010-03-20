@@ -5,23 +5,28 @@
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.JLayeredPane;
+import javax.swing.JTextArea;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.Graphics2D;
 import java.awt.BasicStroke;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -55,7 +60,7 @@ public class TracingInterface
 	
 	// Checkboxes
 	JCheckBox singleStrokeLengths, allStrokeLength, minStrokeLength, maxStrokeLength,
-	          meanStrokeLength, endToEndLengths, averageDistanceBetween, cosStartingAngle,
+	          meanStrokeLength, numStrokes, endToEndLengths, averageDistanceBetween, cosStartingAngle,
 	          sineStartingAngle, lengthOfDiagonal, angleOfDiagonal, strokeDistance,
 	          cosEndingAngle, sinEndingAngle, totalRotationalChange, totalAbsoluteRotation,
 	          smoothness, maximumSpeedSquared, minimumSpeedSquared, averageSpeedSquared,
@@ -175,6 +180,7 @@ public class TracingInterface
 					minStrokeLength.setSelected(true);
 					maxStrokeLength.setSelected(true);
 			        meanStrokeLength.setSelected(true);
+			        numStrokes.setSelected(true);
 			        endToEndLengths.setSelected(true);
 			        averageDistanceBetween.setSelected(true);
 			        cosStartingAngle.setSelected(true);
@@ -211,6 +217,7 @@ public class TracingInterface
 					minStrokeLength.setSelected(false);
 					maxStrokeLength.setSelected(false);
 			        meanStrokeLength.setSelected(false);
+			        numStrokes.setSelected(false);
 			        endToEndLengths.setSelected(false);
 			        averageDistanceBetween.setSelected(false);
 			        cosStartingAngle.setSelected(false);
@@ -561,6 +568,8 @@ public class TracingInterface
 		leftPanel.add(maxStrokeLength);
 	    meanStrokeLength = new JCheckBox("Mean Stroke Length");
 		leftPanel.add(meanStrokeLength);
+		numStrokes = new JCheckBox("Number of Strokes");
+		leftPanel.add(numStrokes);
 		endToEndLengths = new JCheckBox("End to End Lengths");
 		leftPanel.add(endToEndLengths);
 		averageDistanceBetween = new JCheckBox("Average Distance Between Strokes");
@@ -605,7 +614,7 @@ public class TracingInterface
 		density1 = new JCheckBox("Density Metric 1");
 		leftPanel.add(density1);
 		density2 = new JCheckBox("Density Metric 2");
-		leftPanel.add(density2);
+		rightPanel.add(density2);
 		openness = new JCheckBox("Openness");
 		rightPanel.add(openness);
 		areaOfBox = new JCheckBox("Area of Bounding Box");
@@ -618,11 +627,6 @@ public class TracingInterface
 		rightPanel.add(logTotalLength);
 		logOfCurviness = new JCheckBox("Log of Curviness");
 		rightPanel.add(logOfCurviness);
-		
-		
-		
-		
-		
 		
 		// Analyze button at the bottom
 		analyzeButton = new JButton("Analyze");
@@ -642,18 +646,58 @@ public class TracingInterface
 	public void printAnalysis()
 	{
 		printWindow = new JFrame("Stroke Analysis");
-		printWindow.setSize(500, 700);
+		printWindow.setSize(600, 700);
 		printWindow.setLocation(100, 50);
 		printWindow.setResizable(false);
 		printWindow.setVisible(true);
 		
-		analyzeWindow.setLayout(new GridLayout(1, 2));
+		printWindow.setLayout(new GridLayout(1, 2));
 		JPanel leftPanel = new JPanel();
-		leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
-		analyzeWindow.add(leftPanel);
+		JTextArea leftText = new JTextArea();
+		leftPanel.add(leftText);
+		printWindow.add(leftPanel);
 		JPanel rightPanel = new JPanel();
-		rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
-		analyzeWindow.add(rightPanel);
+		JTextArea rightText = new JTextArea();
+		rightPanel.add(rightText);
+		printWindow.add(rightPanel);
+		
+		// Large Font
+		Font largeFont = new Font("Verdana", Font.PLAIN, 20);
+		
+		// Show multiple stroke Analysis first
+		JLabel multiple = new JLabel("Multi-Stroke Analysis");
+		multiple.setFont(largeFont);
+		JLayeredPane lp = printWindow.getLayeredPane();
+		multiple.setBounds(175, -20, 250, 100);
+		lp.add(multiple, new Integer(1));
+		
+		// Formatting
+		DecimalFormat myFormat = new DecimalFormat("###.##");
+		leftText.append("\n\n\n");
+		
+		// Total Stroke Length
+		if (allStrokeLength.isSelected())
+			leftText.append("Total Stroke Length: " + myFormat.format(Tools.allStrokesLength(strokes)) + "\n");
+		
+		// Minimum Stroke Length
+		if (minStrokeLength.isSelected())
+			leftText.append("Minimum Stroke Length: " + myFormat.format(Tools.minStrokeLength(strokes)) + "\n");
+
+		// Maximum Stroke Length
+		if (maxStrokeLength.isSelected())
+			leftText.append("Maximum Stroke Length: " + myFormat.format(Tools.maxStrokeLength(strokes)) + "\n");
+
+		// Average Stroke Length
+		if (meanStrokeLength.isSelected())
+			leftText.append("Mean Stroke Length: " + myFormat.format(Tools.meanStrokeLength(strokes)) + "\n");
+
+		// Number of Strokes
+		if (numStrokes.isSelected())
+			leftText.append("Number of Strokes: " + myFormat.format(Tools.numStrokes(strokes)) + "\n");
+
+		// Average Distance Between Strokes
+		if (averageDistanceBetween.isSelected())
+			leftText.append("Average Distance Between Strokes: " + myFormat.format(Tools.avgDistBetweenStrokes(strokes)) + "\n");
 	}
 
 	// Add a mouse listener that checks for mouse up, and if there is a mouse up, then clear past and current x and y
@@ -685,6 +729,7 @@ public class TracingInterface
 			curr_x = e.getX();
 			curr_y = e.getY();
 			strokes.get(current_stroke).addPoint(new Point(curr_x, curr_y));
+			strokes.get(current_stroke).addTimestamp(new Long(System.currentTimeMillis()));
 			panel.repaint();
 		}
 
