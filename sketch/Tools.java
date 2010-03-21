@@ -738,9 +738,8 @@ public class Tools
 	//Mike Chenault
 	public static double allStrokesLength(ArrayList<Stroke> myStrokes)
 	{
-		int i;
 		double totalLength = 0;
-		for(i = 0; i < myStrokes.size() - 1; i++)
+		for(int i = 0; i < myStrokes.size(); i++)
 		{
 			totalLength += singleStrokeLength(myStrokes.get(i));
 		}
@@ -784,7 +783,10 @@ public class Tools
 	//Mike Chenuault
 	public static double meanStrokeLength(ArrayList<Stroke> myStrokes)
 	{
-		return allStrokesLength(myStrokes) / (double)myStrokes.size();
+		System.out.println("Total Length: " + allStrokesLength(myStrokes));
+		System.out.println("Total Number of Strokes: " + (double)myStrokes.size());
+		System.out.println("This is the mean length: " + (allStrokesLength(myStrokes) / (double)myStrokes.size()));
+		return allStrokesLength(myStrokes) / (double)numStrokes(myStrokes);
 	}
 
 	//returns length from start point of stroke to end point of stroke
@@ -806,9 +808,9 @@ public class Tools
 	{
 		int i;
 		double totalLength = 0;
-		for(i=0; i<myStrokes.size()-1; i++)
+		for(i=0; i<myStrokes.size()-2; i++)
 		{
-			if(i!=myStrokes.size()-1  && (myStrokes.get(i+1).getPoints().size()>1))
+			if(i!=myStrokes.size()-1  && (myStrokes.get(i+1).getSize()>1))
 				totalLength += getLength(myStrokes.get(i).getPoints().get(myStrokes.get(i).getPoints().size()-1), myStrokes.get(i+1).getPoints().get(0));
 		}
 		return totalLength / (double)myStrokes.size();
@@ -971,16 +973,19 @@ public class Tools
 	
 	//Makes elongates the stroke already drawn
 	//Mike Chenault
-	public static ArrayList<Stroke> elongateStroke(Stroke myStroke) {
+	public static Stroke elongateStroke(Stroke origStroke) {
+		Stroke myStroke = new Stroke();
+		myStroke.equals(origStroke);
+	
 		for(int i = 0; i < myStroke.getPoints().size()-1; i++) {
-			int y2 = myStroke.getPoints.get(i+1).getY();
-			int y1 = myStroke.getPoints.get(i).getY();
-			int x2 = myStroke.getPoints.get(i+1).getX();
-			int x1 = myStroke.getPoints.get(i).getX()
+			int y2 = myStroke.getPoints().get(i+1).y;
+			int y1 = myStroke.getPoints().get(i).y;
+			int x2 = myStroke.getPoints().get(i+1).x;
+			int x1 = myStroke.getPoints().get(i).x;
 			
 			//get m
-			int m_top = myStroke.getPoints.get(i+1).getY() - myStroke.getPoints.get(i).getY();
-			int m_bot = myStroke.getPoints.get(i+1).getX() - myStroke.getPoints.get(i).getX();
+			int m_top = y2 - y1;
+			int m_bot = x2 - x1;
 			double m = m_top / m_bot;
 			
 			Random rand = new Random();
@@ -993,22 +998,23 @@ public class Tools
 				increaseY = 0;
 			}
 			
-			int newX = (y2 + increaseY - y1 - (m * x2)) / m;
+			int newX = (int)((y2 + increaseY - y1 - (m * x2)) / m);
 			
-			myStroke.getPoints().set(i+1, Point(newX, y2 + increaseY);
+			myStroke.getPoints().set(i+1, new Point(newX, y2 + increaseY));
 			
 			//Alter the rest of the strokes to fit
 			if(i+2 <= myStroke.getPoints().size()-1) {
-				xDiff = newX - x2;
-				yDiff = increaseY;
+				int xDiff = newX - x2;
+				int yDiff = increaseY;
 			
 				for(int j = i+2; j < myStroke.getPoints().size(); j++) {
-					int currX = myStroke.getPoint(j).getX();
-					int currY = myStroke.getPoint(j).getY();
-					myStroke.getPoints().set(j, Point(currX + xDiff, currY + yDiff)); 
+					int currX = myStroke.getPoint(j).x;
+					int currY = myStroke.getPoint(j).y;
+					myStroke.getPoints().set(j, new Point(currX + xDiff, currY + yDiff)); 
 				}
 			} //end if
 		}
+		return myStroke;
 	}
 
 	/**
