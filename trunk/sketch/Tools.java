@@ -27,7 +27,8 @@ public class Tools
 
 		return ( (p2.getX() - p1.getX())
 				/
-				Math.sqrt(  Math.pow( (p2.getY()- p1.getY()), 2) + Math.pow((p2.getX()- p1.getX()), 2) ) );
+				Math.sqrt(  Math.pow(  Math.abs( (p2.getY()- p1.getY()) ), 2) + 
+							Math.pow(  Math.abs( (p2.getX()- p1.getX()) ), 2) ) );
 	}
 
 	//Rubine feature 2
@@ -44,8 +45,8 @@ public class Tools
 
 		return ( (p2.getY() - p1.getY()) //FLAG used to be a '*' instead of '-'
 				/
-				Math.sqrt(  Math.pow( (p2.getY() - p1.getY()), 2) +
-							Math.pow( (p2.getX() - p1.getX()), 2) ) );
+				Math.sqrt(  Math.pow(  Math.abs( (p2.getY() - p1.getY()) ), 2) +
+							Math.pow(  Math.abs( (p2.getX() - p1.getX()) ), 2) ) );
 	}
 
 	//Rubine feature 3
@@ -64,23 +65,43 @@ public class Tools
 		Point pYmax = stroke.getPoint(0); //default initialization to make Eclipse happy
 		Point pYmin = stroke.getPoint(0); //default initialization to make Eclipse happy
 
-		for(int i=0; i<stroke.getSize(); i++){
-
+		System.out.println( "stroke length: " + stroke.getSize() );
+		
+		for(int i=0; i<stroke.getSize()-1; i++){
+			
 			if( stroke.getPoint(i).getX() >= currXmax )
+			{
 				pXmax = stroke.getPoint(i);
+				currXmax = pXmax.getX();
+			}
 
 			if( stroke.getPoint(i).getX() <= currXmin )
+			{
 				pXmin = stroke.getPoint(i);
+				currXmin = pXmin.getX();
+			}
 
 			if( stroke.getPoint(i).getY() >= currYmax )
+			{
 				pYmax = stroke.getPoint(i);
+				currYmax = pYmax.getY();
+			}
 
 			if( stroke.getPoint(i).getY() <= currYmin )
+			{
 				pYmin = stroke.getPoint(i);
+				currYmin = pYmin.getY();
+			}
 		}
 
-		return Math.sqrt( Math.pow( (pYmax.getY()- pYmin.getY()), 2) +
-						  Math.pow( (pXmax.getX()- pXmin.getX()), 2) );
+		System.out.println( "pXmin: " + pXmin );
+		System.out.println( "pXmax: " + pXmax );
+		System.out.println( "pYmin: " + pYmin );
+		System.out.println( "pYmax: " + pYmax );
+		
+		
+		return Math.sqrt( Math.pow( Math.abs( (pYmax.getY()- pYmin.getY()) ), 2) +
+						  Math.pow( Math.abs( (pXmax.getX()- pXmin.getX()) ), 2) );
 	}
 
 	//Rubine feature 4
@@ -101,16 +122,28 @@ public class Tools
 		for(int i=0; i<stroke.getSize(); i++){
 
 			if( stroke.getPoint(i).getX() >= currXmax )
+			{
 				pXmax = stroke.getPoint(i);
+				currXmax = pXmax.getX();
+			}
 
 			if( stroke.getPoint(i).getX() <= currXmin )
+			{
 				pXmin = stroke.getPoint(i);
+				currXmin = pXmin.getX();
+			}
 
 			if( stroke.getPoint(i).getY() >= currYmax )
+			{
 				pYmax = stroke.getPoint(i);
+				currYmax = pYmax.getY();
+			}
 
 			if( stroke.getPoint(i).getY() <= currYmin )
+			{
 				pYmin = stroke.getPoint(i);
+				currYmin = pYmin.getY();
+			}
 		}
 
 		return Math.atan( ( pYmax.getY() - pYmin.getY() ) /
@@ -473,16 +506,28 @@ public class Tools
 		for(int i=0; i<stroke.getSize(); i++){
 
 			if( stroke.getPoint(i).getX() >= currXmax )
+			{
 				pXmax = stroke.getPoint(i);
+				currXmax = pXmax.getX();
+			}
 
 			if( stroke.getPoint(i).getX() <= currXmin )
+			{
 				pXmin = stroke.getPoint(i);
+				currXmin = pXmin.getX();
+			}
 
 			if( stroke.getPoint(i).getY() >= currYmax )
+			{
 				pYmax = stroke.getPoint(i);
+				currYmax = pYmax.getY();
+			}
 
 			if( stroke.getPoint(i).getY() <= currYmin )
+			{
 				pYmin = stroke.getPoint(i);
+				currYmin = pYmin.getY();
+			}
 		}
 
 		double lengthOfDiagonal = Math.sqrt( Math.pow( (pYmax.getY()- pYmin.getY()), 2) +
@@ -519,16 +564,28 @@ public class Tools
 		for(int i=0; i<stroke.getSize(); i++){
 
 			if( stroke.getPoint(i).getX() >= currXmax )
+			{
 				pXmax = stroke.getPoint(i);
+				currXmax = pXmax.getX();
+			}
 
 			if( stroke.getPoint(i).getX() <= currXmin )
+			{
 				pXmin = stroke.getPoint(i);
+				currXmin = pXmin.getX();
+			}
 
 			if( stroke.getPoint(i).getY() >= currYmax )
+			{
 				pYmax = stroke.getPoint(i);
+				currYmax = pYmax.getY();
+			}
 
 			if( stroke.getPoint(i).getY() <= currYmin )
+			{
 				pYmin = stroke.getPoint(i);
+				currYmin = pYmin.getY();
+			}
 		}
 
 		double lengthOfDiagonal = Math.sqrt( Math.pow( (pYmax.getY()- pYmin.getY()), 2) +
@@ -556,16 +613,28 @@ public class Tools
 		for(int i=0; i<stroke.getSize(); i++){
 
 			if( stroke.getPoint(i).getX() >= currXmax )
+			{
 				pXmax = stroke.getPoint(i);
+				currXmax = pXmax.getX();
+			}
 
 			if( stroke.getPoint(i).getX() <= currXmin )
+			{
 				pXmin = stroke.getPoint(i);
+				currXmin = pXmin.getX();
+			}
 
 			if( stroke.getPoint(i).getY() >= currYmax )
+			{
 				pYmax = stroke.getPoint(i);
+				currYmax = pYmax.getY();
+			}
 
 			if( stroke.getPoint(i).getY() <= currYmin )
+			{
 				pYmin = stroke.getPoint(i);
+				currYmin = pYmin.getY();
+			}
 		}
 
 		double width  = pXmax.getX() - pXmin.getY();
@@ -593,16 +662,28 @@ public class Tools
 		for(int i=0; i<stroke.getSize(); i++){
 
 			if( stroke.getPoint(i).getX() >= currXmax )
+			{
 				pXmax = stroke.getPoint(i);
+				currXmax = pXmax.getX();
+			}
 
 			if( stroke.getPoint(i).getX() <= currXmin )
+			{
 				pXmin = stroke.getPoint(i);
+				currXmin = pXmin.getX();
+			}
 
 			if( stroke.getPoint(i).getY() >= currYmax )
+			{
 				pYmax = stroke.getPoint(i);
+				currYmax = pYmax.getY();
+			}
 
 			if( stroke.getPoint(i).getY() <= currYmin )
+			{
 				pYmin = stroke.getPoint(i);
+				currYmin = pYmin.getY();
+			}
 		}
 
 		double width  = pXmax.getX() - pXmin.getY();
@@ -695,16 +776,28 @@ public class Tools
 	for(int i=0; i<stroke.getSize(); i++){
 
 		if( stroke.getPoint(i).getX() >= currXmax )
+		{
 			pXmax = stroke.getPoint(i);
+			currXmax = pXmax.getX();
+		}
 
 		if( stroke.getPoint(i).getX() <= currXmin )
+		{
 			pXmin = stroke.getPoint(i);
+			currXmin = pXmin.getX();
+		}
 
 		if( stroke.getPoint(i).getY() >= currYmax )
+		{
 			pYmax = stroke.getPoint(i);
+			currYmax = pYmax.getY();
+		}
 
 		if( stroke.getPoint(i).getY() <= currYmin )
+		{
 			pYmin = stroke.getPoint(i);
+			currYmin = pYmin.getY();
+		}
 	}
 
 	return Math.log10( Math.abs( Math.atan( ( pYmax.getY() - pYmin.getY() ) /
