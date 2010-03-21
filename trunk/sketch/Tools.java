@@ -5,6 +5,7 @@
 //package sketch;
 
 import java.util.ArrayList;
+import java.util.Random;
 import java.awt.Point;
 
 public class Tools
@@ -966,6 +967,48 @@ public class Tools
 			}
 		}
 		return newStrokes;
+	}
+	
+	//Makes elongates the stroke already drawn
+	//Mike Chenault
+	public static ArrayList<Stroke> elongateStroke(Stroke myStroke) {
+		for(int i = 0; i < myStroke.getPoints().size()-1; i++) {
+			int y2 = myStroke.getPoints.get(i+1).getY();
+			int y1 = myStroke.getPoints.get(i).getY();
+			int x2 = myStroke.getPoints.get(i+1).getX();
+			int x1 = myStroke.getPoints.get(i).getX()
+			
+			//get m
+			int m_top = myStroke.getPoints.get(i+1).getY() - myStroke.getPoints.get(i).getY();
+			int m_bot = myStroke.getPoints.get(i+1).getX() - myStroke.getPoints.get(i).getX();
+			double m = m_top / m_bot;
+			
+			Random rand = new Random();
+			int increaseY = rand.nextInt(21);
+			
+			//should y be going up or down
+			if(y2 < y1) {
+				increaseY = 0 - increaseY;
+			} else if (y2 == y1) {
+				increaseY = 0;
+			}
+			
+			int newX = (y2 + increaseY - y1 - (m * x2)) / m;
+			
+			myStroke.getPoints().set(i+1, Point(newX, y2 + increaseY);
+			
+			//Alter the rest of the strokes to fit
+			if(i+2 <= myStroke.getPoints().size()-1) {
+				xDiff = newX - x2;
+				yDiff = increaseY;
+			
+				for(int j = i+2; j < myStroke.getPoints().size(); j++) {
+					int currX = myStroke.getPoint(j).getX();
+					int currY = myStroke.getPoint(j).getY();
+					myStroke.getPoints().set(j, Point(currX + xDiff, currY + yDiff)); 
+				}
+			} //end if
+		}
 	}
 
 	/**
