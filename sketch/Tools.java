@@ -64,8 +64,6 @@ public class Tools
 		double currYmin = Double.POSITIVE_INFINITY;
 		Point pYmax = stroke.getPoint(0); //default initialization to make Eclipse happy
 		Point pYmin = stroke.getPoint(0); //default initialization to make Eclipse happy
-
-		System.out.println( "stroke length: " + stroke.getSize() );
 		
 		for(int i=0; i<stroke.getSize()-1; i++){
 			
@@ -93,12 +91,6 @@ public class Tools
 				currYmin = pYmin.getY();
 			}
 		}
-
-		System.out.println( "pXmin: " + pXmin );
-		System.out.println( "pXmax: " + pXmax );
-		System.out.println( "pYmin: " + pYmin );
-		System.out.println( "pYmax: " + pYmax );
-		
 		
 		return Math.sqrt( Math.pow( Math.abs( (pYmax.getY()- pYmin.getY()) ), 2) +
 						  Math.pow( Math.abs( (pXmax.getX()- pXmin.getX()) ), 2) );
@@ -199,9 +191,21 @@ public class Tools
 	//Sum from p=1 to n-2 of theta(p)
 	//theta(p) = arctan[(Dxp*Dyp-1Dxp-1*Dyp)=(Dxp*Dxp-1 + Dyp * Dyp-1)]
 	//this could be wrong...
+	//should be theta(p) = arctan( Dy / Dx );
 	//Ross Peterson
 	public static double totalRotationalChange(Stroke stroke){
-
+		/*
+		Point p0 = stroke.getPoint(0);
+		Point pN = stroke.getPoint(stroke.getSize());
+		
+		
+		double rise = pN.getY() - p0.getY();
+		double run = pN.getX() - p0.getX();
+		
+		double totalRotationalChange = Math.atan( rise / run );
+		return totalRotationalChange;
+		*/
+		
 		double totalRotationalChange = 0;
 		for(int i = stroke.getSize()-2; i > 1; i--){
 
@@ -209,6 +213,8 @@ public class Tools
 			Point pMinus1 = stroke.getPoint(i-1);
 			Point pMinus2 = stroke.getPoint(i-2);
 
+			
+			
 			totalRotationalChange += Math.atan(
 					(
 					( (p.getX()       - pMinus1.getX()) * (pMinus1.getY() - pMinus2.getY()) ) *
@@ -220,6 +226,8 @@ public class Tools
 				    );
 		}
 		return totalRotationalChange;
+		
+		
 	}
 
 	//Rubine feature 10
@@ -281,9 +289,12 @@ public class Tools
 	public static double maximumSpeedSquared(Stroke stroke){
 
 		double maximumSpeed = Double.NEGATIVE_INFINITY;
-
+		
+		
 		for(int i = 1; i < stroke.getSize()-2; i++){
-
+			
+			double currSpeed = 0;
+			
 			Point p 	  = stroke.getPoint(i);
 			Point pMinus1 = stroke.getPoint(i-1);
 
@@ -291,14 +302,26 @@ public class Tools
 			Long tMinus1 = stroke.getTimestamp(i-1);
 
 			double d = t - tMinus1;
-
-			double currSpeed  = (
+			//System.out.println("d: " + d + "   P = " + p + "   pMinus1 = " + pMinus1);
+			//System.out.println("t = "+ t + "   tMinux1 = " + tMinus1);
+			
+			if( d == 0 ){
+				continue;
+			}
+			else{
+				currSpeed  = (
 					   			 ( Math.pow((p.getX()-pMinus1.getX()),2) + Math.pow((p.getX()-pMinus1.getX()),2) ) /
 					   			 Math.pow( d,2 )
 					  			);
-			if( currSpeed > maximumSpeed )
-			 	{ maximumSpeed = currSpeed; }
 			}
+			
+			if( currSpeed > maximumSpeed )
+			 	{ 
+				maximumSpeed = currSpeed;
+			 	}
+			
+		}
+
 		return maximumSpeed;
 	}
 
@@ -310,6 +333,8 @@ public class Tools
 
 		for(int i = 1; i < stroke.getSize()-2; i++){
 
+			double currSpeed = 0;
+			
 			Point p 	  = stroke.getPoint(i);
 			Point pMinus1 = stroke.getPoint(i-1);
 
@@ -318,13 +343,21 @@ public class Tools
 
 			double d = t - tMinus1;
 
-			double currSpeed  = (
+			if( d == 0 )
+			{
+				continue;
+			}
+			else{
+				  currSpeed  = (
 					   			 ( Math.pow((p.getX()-pMinus1.getX()),2) + Math.pow((p.getX()-pMinus1.getX()),2) ) /
 					   			 Math.pow( d,2 )
 					  			);
-			if( currSpeed < minimumSpeed )
-			 	{ minimumSpeed = currSpeed; }
 			}
+			if( currSpeed < minimumSpeed )
+			 	{ 
+				minimumSpeed = currSpeed; 
+				}
+		}
 		return minimumSpeed;
 	}
 
@@ -345,11 +378,17 @@ public class Tools
 
 			double d = t - tMinus1;
 
+			if( d == 0 )
+			{
+				continue;
+			}
+			else{
 			totalSpeed  += (
 					   			 ( Math.pow((p.getX()-pMinus1.getX()),2) + Math.pow((p.getX()-pMinus1.getX()),2) ) /
 					   			 Math.pow( d,2 )
 					  			);
 			}
+		}
 
 		averageSpeed = totalSpeed / stroke.getSize();
 		return averageSpeed;
@@ -391,16 +430,28 @@ public class Tools
 	for(int i=0; i<stroke.getSize(); i++){
 
 		if( stroke.getPoint(i).getX() >= currXmax )
+		{
 			pXmax = stroke.getPoint(i);
+			currXmax = pXmax.getX();
+		}
 
 		if( stroke.getPoint(i).getX() <= currXmin )
+		{
 			pXmin = stroke.getPoint(i);
+			currXmin = pXmin.getX();
+		}
 
 		if( stroke.getPoint(i).getY() >= currYmax )
+		{
 			pYmax = stroke.getPoint(i);
+			currYmax = pYmax.getY();
+		}
 
 		if( stroke.getPoint(i).getY() <= currYmin )
+		{
 			pYmin = stroke.getPoint(i);
+			currYmin = pYmin.getY();
+		}
 	}
 
 	return Math.abs( Math.atan( ( pYmax.getY() - pYmin.getY() ) /

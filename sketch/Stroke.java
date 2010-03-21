@@ -26,6 +26,10 @@ public class Stroke
 		timestamps = new ArrayList<Long>();
 		color = c;
 	}
+	
+	public void showStats() {
+		System.out.println("Points Size = " + points.size() + "\ntimeStamps Size = " + timestamps.size());
+	}
 
 	// Adds a point
 	public void addPoint(Point pt)
