@@ -783,9 +783,6 @@ public class Tools
 	//Mike Chenuault
 	public static double meanStrokeLength(ArrayList<Stroke> myStrokes)
 	{
-		System.out.println("Total Length: " + allStrokesLength(myStrokes));
-		System.out.println("Total Number of Strokes: " + (double)myStrokes.size());
-		System.out.println("This is the mean length: " + (allStrokesLength(myStrokes) / (double)myStrokes.size()));
 		return allStrokesLength(myStrokes) / (double)numStrokes(myStrokes);
 	}
 
