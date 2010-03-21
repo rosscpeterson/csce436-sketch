@@ -895,8 +895,6 @@ public class Tools
 		return newStroke;
 	}
 
-	/***	This code incorrectly mirrors vertically.  Why? I don't know!  ***/
-	/*** Fom Mike: I think I fixed it.  Changed getY to get X second line of loop ***/
 	//Mirrors a stroke across a horizontal line
 	//Mike Chenault
 	public static Stroke mirrorVerticalStroke(Stroke stroke, int windowSize_Y)
@@ -923,8 +921,6 @@ public class Tools
 		return newStrokes;
 	}
 
-	/***	This code incorrectly mirrors vertically.  Why? I don't know!  ***/
-	/***   From Mike: Should now be fixed due to the helper function being fixed ***/
 	//Mirrors all strokes across a horizontal line
 	//Mike Chenault
 	public static ArrayList<Stroke> mirrorAllVertical(ArrayList<Stroke> strokes, int windowSize_Y)
@@ -937,7 +933,6 @@ public class Tools
 		return newStrokes;
 	}
 
-	/***	This code does not create dashed lines.  Why? I don't know!  ***/
 	//Removes every other segment of a stroke to make all the stroke appear dashed
 	//Mike Chenault
 	public static ArrayList<Stroke> makeDashed(Stroke stroke)
@@ -956,7 +951,6 @@ public class Tools
 		return newStrokes;
 	}
 
-	/***	This code does not create dashed lines.  Why? I don't know!  ***/
 	//Removes every other segment of a stroke to make all the stroke appear dashed
 	//Mike Chenault
 	public static ArrayList<Stroke> makeAllDashed(ArrayList<Stroke> strokes)
@@ -974,6 +968,441 @@ public class Tools
 		return newStrokes;
 	}
 	
+	/**
+	 *	Randomly make the stroke messy by at most 20 pixels off each
+	 *	Author: Travis
+	 *
+	 *	@param stroke the original stroke to be modified
+	 *	@return a new stroke with a randomized offset on each point
+	 */
+	public static Stroke randomMessy(Stroke stroke)
+	{
+		java.util.Random rand = new java.util.Random();
+		Stroke newStroke = new Stroke(stroke.getColor());
+		ArrayList<Point> newStrokePoints = new ArrayList<Point>();
+
+		//add all points currently in stroke to a new list of points
+		for(Point point : stroke.getPoints())
+			newStrokePoints.add(new Point((int)point.getX(), (int)point.getY()));
+
+		//change all points by a small random offset
+		for(Point point : newStrokePoints)
+		{
+			point.setLocation(point.getX() + rand.nextInt(11) - rand.nextInt(11), point.getY() + rand.nextInt(11) - rand.nextInt(11));
+			newStroke.addPoint(point);
+		}
+
+		return newStroke;
+	}
+
+	/**
+	 *	Make the stroke messy based on a change in acceleration
+	 *	Author: Travis
+	 *
+	 *	@param stroke the original stroke to be modified
+	 *	@return a new stroke with a acceleration-based offset on each point
+	 */
+	public static Stroke accelerationMessy(Stroke stroke)
+	{
+		Stroke newStroke = new Stroke(stroke.getColor());
+		double changeInX = 0;
+		double changeInY = 0;
+
+		//change all points by an offset
+		for(int i = 0; i < stroke.getPoints().size(); i++)
+		{
+			if(i>0)
+			{
+				//calculate the acceleration a^2/t
+				changeInX = (Math.pow(stroke.getPoint(i).getX()-stroke.getPoint(i-1).getX(),2))/(stroke.getTimestamp(i) - stroke.getTimestamp(i-1));
+				changeInY = (Math.pow(stroke.getPoint(i).getY()-stroke.getPoint(i-1).getY(),2))/(stroke.getTimestamp(i) - stroke.getTimestamp(i-1));
+				//account for decelleration
+				if(stroke.getPoint(i).getX()-stroke.getPoint(i-1).getX()<0)
+					changeInX*=-1;
+				if(stroke.getPoint(i).getY()-stroke.getPoint(i-1).getY()<0)
+					changeInY*=-1;
+			}
+
+			newStroke.addPoint(new Point((int)(stroke.getPoint(i).getX() + changeInX), (int)(stroke.getPoint(i).getY() + changeInY)));
+		}
+
+		return newStroke;
+	}
+
+	/**
+	 *	Make each stroke contain the bounding box of each point to point substroke
+	 *	Author: Travis
+	 *
+	 *	@param stroke the original stroke to be modified
+	 *	@return a point to point bounding box representation of the stroke
+	 */
+	public static Stroke boundingBoxSubStrokes(Stroke stroke)
+	{
+		Stroke newStroke = new Stroke(stroke.getColor());
+
+		//change all points by an offset
+		for(int i = 0; i < stroke.getPoints().size()-1; i++)
+		{
+			//original x and original y
+			newStroke.addPoint(new Point(stroke.getPoint(i)));
+			//next x and original y
+			newStroke.addPoint(new Point((int)(stroke.getPoint(i+1).getX()), (int)(stroke.getPoint(i).getY())));
+			//next x and next y
+			newStroke.addPoint(new Point(stroke.getPoint(i+1)));
+			//original x and next y
+			newStroke.addPoint(new Point((int)(stroke.getPoint(i).getX()), (int)(stroke.getPoint(i+1).getY())));
+			//original x and original y
+			newStroke.addPoint(new Point(stroke.getPoint(i)));
+		}
+
+		return newStroke;
+	}
+
+	/**
+	 *	The values less than the line drawn are "shaded"
+	 *	Author: Travis
+	 *
+	 *	@param stroke the original stroke to be modified
+	 *	@return the stroke with values less than the line shaded
+	 */
+	public static Stroke lowerBoundShaded(Stroke stroke)
+	{
+		Stroke newStroke = new Stroke(stroke.getColor());
+
+		for(Point point : stroke.getPoints())
+		{
+			newStroke.addPoint(point);
+			newStroke.addPoint(new Point((int)point.getX(),(int)(point.getY() + TracingInterface.WINDOW_SIZE_Y)));
+			newStroke.addPoint(point);
+		}
+
+		return newStroke;
+	}
+
+	/**
+	 *	The values greater than the line drawn are "shaded"
+	 *	Author: Travis
+	 *
+	 *	@param stroke the original stroke to be modified
+	 *	@return the stroke with values greater thann the line shaded
+	 */
+	public static Stroke upperBoundShaded(Stroke stroke)
+	{
+		Stroke newStroke = new Stroke(stroke.getColor());
+
+		for(Point point : stroke.getPoints())
+		{
+			newStroke.addPoint(point);
+			newStroke.addPoint(new Point((int)point.getX(),(int)(point.getY() - TracingInterface.WINDOW_SIZE_Y)));
+			newStroke.addPoint(point);
+		}
+
+		return newStroke;
+	}
+
+	/**
+	 *	Straighten a stroke to be more rigid
+	 *	Author: Travis
+	 *
+	 *	@param stroke the original stroke to be modified
+	 *	@return a more rigid version of the stroke entered
+	 */
+	public static Stroke makeRigid(Stroke stroke)
+	{
+		Stroke newStroke = new Stroke(stroke.getColor());
+
+		//add beginning point
+		newStroke.addPoint(new Point(stroke.getPoint(0)));
+
+		for(int i=1; i < stroke.getPoints().size()-1; i+=5)
+		{
+			newStroke.addPoint(stroke.getPoints().get(i));
+		}
+
+		//add end point
+		newStroke.addPoint(new Point(stroke.getPoint(stroke.getPoints().size()-1)));
+
+		return newStroke;
+	}
+
+	/**
+	 *	Turn a normal stroke into a ribbon-like stroke
+	 *	Author: Travis
+	 *
+	 *	@param stroke the original stroke to be modified
+	 *	@return a ribbon-like version of the original stroke
+	 */
+	public static Stroke ribbonEffect(Stroke stroke)
+	{
+		Stroke newStroke = new Stroke(stroke.getColor());
+
+		for(int k = 0; k < 7; k++)
+		{
+			if(k != 0)
+			{
+				stroke = new Stroke(newStroke.getColor());
+				for(Point point : newStroke.getPoints())
+					stroke.addPoint(point);
+			}
+
+			//add beginning point
+			newStroke.addPoint(new Point(stroke.getPoint(0)));
+			if(stroke.getPoints().size()>3)
+				newStroke.addPoint(travis7a(stroke.getPoint(0),stroke.getPoint(0),stroke.getPoint(1),stroke.getPoint(2)));
+			for(int i=1; i < stroke.getPoints().size()-2; i++)
+			{
+				newStroke.addPoint(travis7a(stroke.getPoint(i-1),stroke.getPoint(i),stroke.getPoint(i+1),stroke.getPoint(i+2)));
+			}
+			if(stroke.getPoints().size()>2)
+				newStroke.addPoint(travis7a(stroke.getPoint(stroke.getPoints().size()-3),stroke.getPoint(stroke.getPoints().size()-2),stroke.getPoint(stroke.getPoints().size()-1),stroke.getPoint(stroke.getPoints().size()-1)));
+			//add end point
+			newStroke.addPoint(new Point(stroke.getPoint(stroke.getPoints().size()-1)));
+
+		}
+
+		return newStroke;
+	}
+
+	/**
+	 *	Intelligent curve producing function
+	 *	Author: Travis
+	 *
+	 *	@param a first endpoint
+	 *	@param a second endpoint
+	 *	@return a midpoint with an offset toward the curve of the function 
+	 */
+	private static Point ribbonEffectHelper(Point a, Point b)
+	{
+		double x = (a.getX() + b.getX())/2;
+		double y = (a.getY() + b.getY())/2;
+		double slopeAB = (b.getY() - a.getY())/(b.getX() - a.getX());
+
+		if(slopeAC != 0)
+		{
+			if(a.getX() < b.getX())
+				y = (a.getY() + b.getY())/2 - 5;
+			if(a.getX() > b.getX())
+				y = (a.getY() + b.getY())/2 + 5;
+		}
+
+		return new Point((int)x,(int)y);
+	}
+
+	/**
+	 *	Make each point to point substroke into a diamond-based stroke
+	 *	Author: Travis
+	 *
+	 *	@param stroke the original stroke to be modified
+	 *	@return a point to point diamond-based representation of the stroke
+	 */
+	public static Stroke diamondBasedStroke(Stroke stroke)
+	{
+		Stroke newStroke = new Stroke(stroke.getColor());
+
+		//change all points by an offset
+		for(int i = 0; i < stroke.getPoints().size()-1; i++)
+		{
+			//original x and original y
+			newStroke.addPoint(new Point(stroke.getPoint(i)));
+			//next x and original y
+			newStroke.addPoint(new Point((int)((stroke.getPoint(i).getX() + stroke.getPoint(i+1).getX())/2), (int)(stroke.getPoint(i).getY())));
+			//next x and next y
+			newStroke.addPoint(new Point(stroke.getPoint(i+1)));
+			//original x and next y
+			newStroke.addPoint(new Point((int)((stroke.getPoint(i).getX() + stroke.getPoint(i+1).getX())/2), (int)(stroke.getPoint(i+1).getY())));
+			//original x and original y
+			newStroke.addPoint(new Point(stroke.getPoint(i)));
+			//original x and next y
+			newStroke.addPoint(new Point((int)((stroke.getPoint(i).getX() + stroke.getPoint(i+1).getX())/2), (int)(stroke.getPoint(i+1).getY())));
+		}
+		return newStroke;
+	}
+
+	/**
+	 *	A stroke that only includes sub-strokes under 0.25 px/msec
+	 *	Author: Travis
+	 *
+	 *	@param stroke the original stroke to be modified
+	 *	@return a new stroke that only includes sub-strokes under 0.25 px/msec
+	 */
+	public static Stroke subStrokesWithMinSpeed(Stroke stroke)
+	{
+		Stroke newStroke = new Stroke(stroke.getColor());
+		double changeInX = 0;
+		double changeInY = 0;
+		double speed = 0.25;
+
+		newStroke.addPoint(new Point(stroke.getPoint(0)));
+
+		for(int i = 1; i < stroke.getPoints().size(); i++)
+		{
+			changeInX = Math.abs((stroke.getPoint(i).getX()-stroke.getPoint(i-1).getX())/(stroke.getTimestamp(i) - stroke.getTimestamp(i-1)));
+			changeInY = Math.abs((stroke.getPoint(i).getY()-stroke.getPoint(i-1).getY())/(stroke.getTimestamp(i) - stroke.getTimestamp(i-1)));
+
+			if(changeInX < speed && changeInY < speed)
+				newStroke.addPoint(new Point((stroke.getPoint(i))));
+		}
+
+		return newStroke;
+	}
+
+	/**
+	 *	A stroke that only includes sub-strokes over 0.75 px/msec
+	 *	Author: Travis
+	 *
+	 *	@param stroke the original stroke to be modified
+	 *	@return a new stroke that only includes sub-strokes under 0.75 px/msec
+	 */
+	public static Stroke subStrokesWithMaxSpeed(Stroke stroke)
+	{
+		Stroke newStroke = new Stroke(stroke.getColor());
+		double changeInX = 0;
+		double changeInY = 0;
+		double speed = 0.75;
+
+		newStroke.addPoint(new Point(stroke.getPoint(0)));
+
+		for(int i = 1; i < stroke.getPoints().size(); i++)
+		{
+			changeInX = Math.abs((stroke.getPoint(i).getX()-stroke.getPoint(i-1).getX())/(stroke.getTimestamp(i) - stroke.getTimestamp(i-1)));
+			changeInY = Math.abs((stroke.getPoint(i).getY()-stroke.getPoint(i-1).getY())/(stroke.getTimestamp(i) - stroke.getTimestamp(i-1)));
+
+			if(changeInX > speed && changeInY > speed)
+				newStroke.addPoint(new Point((stroke.getPoint(i))));
+		}
+
+		return newStroke;
+	}
+
+	/**
+	 *	Connect the end of every stroke to the beginning of every stroke
+	 *	This is similar to Mike's lsdEverything, but not quite the same.
+	 *	Author: Travis
+	 *
+	 *	@param strokes the original strokes to be modified
+	 *	@return new strokes with the end of every stroke connected to the beginning of every stroke
+	 */
+	public static ArrayList<Stroke> connectBeginToEndOfAllStrokes(ArrayList<Stroke> strokes)
+	{
+		for(Stroke stroke : strokes)
+		{
+			for(Stroke myStroke : strokes)
+			{
+				if(myStroke.getPoints().size()>0 && stroke.getPoints().size()>2)
+				{
+					stroke.addPoint(myStroke.getPoint(0));
+					stroke.addPoint(stroke.getPoint(stroke.getPoints().size()-2));
+				}
+			}
+		}
+
+		return strokes;
+	}
+
+	/**
+	 *	Connect the end of every stroke to the beginning of every stroke and only show that
+	 *	This is similar to travis11, but without the intermediate sub-strokes
+	 *	Author: Travis
+	 *
+	 *	@param strokes the original strokes to be modified
+	 *	@return new strokes with the end of every stroke connected to the beginning of every stroke and just that
+	 */
+	public static ArrayList<Stroke> connectBeginToEndOfAllStrokesOnly(ArrayList<Stroke> strokes)
+	{
+		ArrayList<Stroke> newStrokes = new ArrayList<Stroke>();
+		Stroke newStroke;
+
+		for(Stroke stroke : strokes)
+		{
+			if(stroke.getPoints().size()>0)
+			{
+				newStroke = new Stroke(stroke.getColor());
+				//add the first element of the stroke
+				newStroke.addPoint(stroke.getPoint(0));
+				//add the last element of the stroke
+				newStroke.addPoint(stroke.getPoint(stroke.getPoints().size()-1));
+				//add the new stroke to the list
+				newStrokes.add(newStroke);
+			}
+		}
+
+		//at this point each stroke in newStrokes should only have two elements
+
+		for(Stroke stroke : newStrokes)
+		{
+			for(Stroke myStroke : newStrokes)
+			{
+				if(myStroke.getPoints().size()>1 && stroke.getPoints().size()>1)
+				{
+					stroke.addPoint(myStroke.getPoint(0));
+					stroke.addPoint(stroke.getPoint(1));
+				}
+			}
+		}
+
+		return newStrokes;
+	}
+
+	/**
+	 *	Only show strokes that have stroke duration of 200 milliseconds or less
+	 *	Author: Travis
+	 *
+	 *	@param strokes the original strokes to be modified
+	 *	@return all strokes with duration of less than 200 milliseconds
+	 */
+	public static ArrayList<Stroke> fastStrokesOnly(ArrayList<Stroke> strokes)
+	{
+		ArrayList<Stroke> newStrokes = new ArrayList<Stroke>();
+		double time = 200;
+
+		for(Stroke stroke : strokes)
+			if(stroke.getStrokeDuration() < time && stroke.getStrokeDuration() > 0)
+				newStrokes.add(stroke);
+		return newStrokes;
+	}
+
+	/**
+	 *	Only show strokes that have stroke duration of 500 milliseconds or more
+	 *	Author: Travis
+	 *
+	 *	@param strokes the original strokes to be modified
+	 *	@return all strokes with duration of more than 500 milliseconds
+	 */
+	public static ArrayList<Stroke> slowStrokesOnly(ArrayList<Stroke> strokes)
+	{
+		ArrayList<Stroke> newStrokes = new ArrayList<Stroke>();
+		double time = 500;
+
+		for(Stroke stroke : strokes)
+			if(stroke.getStrokeDuration() > time)
+				newStrokes.add(stroke);
+		return newStrokes;
+	}
+
+	/**
+	 *	Longest pause between strokes
+	 *	Author: Travis
+	 *
+	 *	@param strokes the original stroke to be analyzed
+	 *	@return the longest pause between strokes in milliseconds
+	 */
+	public static double longestPause(ArrayList<Stroke> strokes)
+	{
+		double longestPause = 0;
+		double pause = 0;
+
+		for(int i = 0; i < strokes.size()-1; i++)
+		{
+			if(strokes.get(i+1).getTimestamps().size()>0 && strokes.get(i).getTimestamps().size()>0)
+			{
+				pause = strokes.get(i+1).getTimestamp(strokes.get(i+1).getTimestamps().size()-1) - strokes.get(i).getTimestamp(0);
+				if(pause > longestPause)
+					longestPause = pause;
+			}
+		}
+
+		return longestPause;
+	}
 	
 }
 
