@@ -1199,7 +1199,7 @@ public class Tools
 		double changeInY = 0;
 
 		//change all points by an offset
-		for(int i = 0; i < stroke.getPoints().size(); i++)
+		for(int i = 0; i < stroke.getSize(); i++)
 		{
 			if(i>0)
 			{
@@ -1564,8 +1564,11 @@ public class Tools
 		double time = 500;
 
 		for(Stroke stroke : strokes)
+		{
+			System.out.println(stroke.toString());
 			if(stroke.getStrokeDuration() > time)
 				newStrokes.add(stroke);
+		}
 		return newStrokes;
 	}
 
