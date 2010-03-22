@@ -39,7 +39,7 @@ public class TracingInterface
 	public final static int WINDOW_SIZE_Y = 700;
 
 	// Member variables
-	private JFrame window, analyzeWindow, printWindow;
+	private JFrame window, analyzeWindow, printWindow, modifyWindow;
 	private JMenuBar menuBar;
 	private JMenu file;
 	private JMenuItem clear, quit;
@@ -47,7 +47,9 @@ public class TracingInterface
 	private JMenuItem blue, black, red, green, yellow, orange, magenta;
 	private JMenu analyze;
 	private JMenuItem analyzeStroke;
-	private JButton analyzeButton, singleButton;
+	private JMenu modify;
+	private JMenuItem modifyStroke;
+	private JButton analyzeButton, singleButton, modifyButton;
 	private JCheckBox selectAll;
 	private JLabel titleLabel;
 	private JTextArea leftText, rightText;
@@ -59,14 +61,20 @@ public class TracingInterface
 	private ArrayList<Stroke> modifiedStrokes;
 	private int current_stroke, analysis_index;
 	
-	// Checkboxes
+	// Checkboxes for analysis
 	JCheckBox singleStrokeLengths, allStrokeLength, minStrokeLength, maxStrokeLength,
 	          meanStrokeLength, numStrokes, endToEndLengths, averageDistanceBetween, cosStartingAngle,
 	          sineStartingAngle, lengthOfDiagonal, angleOfDiagonal, strokeDistance,
-	          cosEndingAngle, sinEndingAngle, totalRotationalChange, totalAbsoluteRotation,
-	          smoothness, maximumSpeedSquared, minimumSpeedSquared, averageSpeedSquared,
-	          strokeTime, aspect, curvature, density1, density2, openness, areaOfBox,
-	          logAreaOfBox, totalAngleOverAbsAngle, logTotalLength, logOfCurviness;
+	          cosEndingAngle, sinEndingAngle, smoothness, maximumSpeedSquared, longestPause,
+	          minimumSpeedSquared, averageSpeedSquared, strokeTime, aspect, curvature,
+	          density1, density2, openness, areaOfBox, logAreaOfBox, logTotalLength, logOfCurviness;
+	
+	// Checkboxes for modify
+	JCheckBox randomMessy, accelerationMessy, boundingBoxSubStrokes, lowerBoundShaded, upperBoundShaded,
+	          makeRigid, ribbonEffect, diamondBasedStroke, subStrokesWithMinSpeed, subStrokesWithMaxSpeed,
+	          connectBeginToEndOfAllStrokes, connectBeginToEndOfAllStrokesOnly, fastStrokesOnly,
+	          slowStrokesOnly, elongateStroke, makeDashed, mirrorVerticalStroke, mirrorHorizontalStroke,
+	          lsdEffect, connectAllStrokes;
 			
 	// Constructor
 	public TracingInterface()
@@ -90,9 +98,11 @@ public class TracingInterface
 		file = new JMenu("File");
 		color = new JMenu("Color");
 		analyze = new JMenu("Analyze");
+		modify = new JMenu("Modify");
 		menuBar.add(file);
 		menuBar.add(color);
 		menuBar.add(analyze);
+		menuBar.add(modify);
 
 		// Set up the file menu
 		clear = new JMenuItem("Clear");
@@ -116,15 +126,18 @@ public class TracingInterface
 		color.add(orange);
 		color.add(magenta);
 		
-		// Set up the analyze menu
+		// Set up the analyze and modify menu
 		analyzeStroke = new JMenuItem("Analyze Stroke");
 		analyze.add(analyzeStroke);
+		modifyStroke = new JMenuItem("Modify Stroke");
+		modify.add(modifyStroke);
 
 		// Add the actionListeners
 		MenuListener menulistener = new MenuListener();
 		quit.addActionListener(menulistener);
 		clear.addActionListener(menulistener);
 		analyzeStroke.addActionListener(menulistener);
+		modifyStroke.addActionListener(menulistener);
 
 		ColorListener colorlistener = new ColorListener();
 		blue.addActionListener(colorlistener);
@@ -169,6 +182,9 @@ public class TracingInterface
 				analysis_index = 0;
 				printAnalysis();
 				
+			} else if (e.getSource() == modifyStroke)
+			{
+				chooseModify();
 			} else if (e.getSource() == singleButton)
 			{
 				if (analysis_index < strokes.size() - 1)
@@ -179,11 +195,16 @@ public class TracingInterface
 				{
 					printWindow.setVisible(false);
 				}
+			} else if (e.getSource() == modifyButton)
+			{
+				modifyWindow.setVisible(false);
+				modifyStrokes();
 		    }else if (e.getSource() == selectAll)
 			{
 				// Check All the boxes
 				if (selectAll.isSelected())
 				{
+					longestPause.setSelected(true);
 					singleStrokeLengths.setSelected(true);
 					allStrokeLength.setSelected(true);
 					minStrokeLength.setSelected(true);
@@ -199,8 +220,6 @@ public class TracingInterface
 			        strokeDistance.setSelected(true);
 			        cosEndingAngle.setSelected(true);
 			        sinEndingAngle.setSelected(true);
-			        totalRotationalChange.setSelected(true);
-			        totalAbsoluteRotation.setSelected(true);
 			        smoothness.setSelected(true);
 			        maximumSpeedSquared.setSelected(true);
 			        minimumSpeedSquared.setSelected(true);
@@ -213,7 +232,6 @@ public class TracingInterface
 			        openness.setSelected(true);
 			        areaOfBox.setSelected(true);
 			        logAreaOfBox.setSelected(true);
-			        totalAngleOverAbsAngle.setSelected(true);
 			        logTotalLength.setSelected(true);
 			        logOfCurviness.setSelected(true);
 				} 
@@ -221,6 +239,7 @@ public class TracingInterface
 				// Uncheck All the boxes
 				else
 				{
+					longestPause.setSelected(false);
 					singleStrokeLengths.setSelected(false);
 					allStrokeLength.setSelected(false);
 					minStrokeLength.setSelected(false);
@@ -236,8 +255,6 @@ public class TracingInterface
 			        strokeDistance.setSelected(false);
 			        cosEndingAngle.setSelected(false);
 			        sinEndingAngle.setSelected(false);
-			        totalRotationalChange.setSelected(false);
-			        totalAbsoluteRotation.setSelected(false);
 			        smoothness.setSelected(false);
 			        maximumSpeedSquared.setSelected(false);
 			        minimumSpeedSquared.setSelected(false);
@@ -250,7 +267,6 @@ public class TracingInterface
 			        openness.setSelected(false);
 			        areaOfBox.setSelected(false);
 			        logAreaOfBox.setSelected(false);
-			        totalAngleOverAbsAngle.setSelected(false);
 			        logTotalLength.setSelected(false);
 			        logOfCurviness.setSelected(false);	
 				}
@@ -288,208 +304,6 @@ public class TracingInterface
 		{
 			super();
 		}
-
-		/*private void printSingleStrokeFeatureAnalysis()
-		{
-			//initial check to see if there are strokes and that those strokes have more than one point in them
-			if(strokes.size()>0 && strokes.get(0).getPoints().size()>1)
-			{
-				if(gross_length_of_stroke.getState() ||
-						net_length_of_stroke.getState())
-					System.out.println("Single Stroke Feature Analysis");
-
-				//Gross Length of Stroke
-				if (gross_length_of_stroke.getState())
-				{
-					System.out.println("\t- Gross Length for each Single Stroke");
-					for(int i = 0; i < strokes.size(); i++)
-					{
-						if(strokes.get(i).getPoints().size()>0)
-							System.out.println("\t\tStroke " + (i+1) + ": " + Tools.singleStrokeLength(strokes.get(i).getPoints()));
-					}
-				}
-
-				//Net Length of Stroke
-				if (net_length_of_stroke.getState())
-				{
-					System.out.println("\t- Net Length for each Single Stroke");
-					for(int i = 0; i < strokes.size(); i++)
-					{
-						if(strokes.get(i).getPoints().size()>0)
-							System.out.println("\t\tStroke " + (i+1) + ": " + Tools.endToEndLength(strokes.get(i).getPoints()));
-					}
-				}
-
-			}
-		}
-
-		private void printMultiStrokeFeatureAnalysis()
-		{
-			//initial check to see if there is more than one stroke and that at least two of those strokes have more than one point in them
-			if(strokes.size()>1 && strokes.get(0).getPoints().size()>1 && strokes.get(1).getPoints().size()>1)
-			{
-				if(min_length_of_strokes.getState() ||
-						max_length_of_strokes.getState() ||
-						avg_length_of_strokes.getState() ||
-						number_of_strokes.getState() ||
-						avg_distance_between_strokes.getState())
-					System.out.println("Multi Stroke Feature Analysis");
-
-				//Minimum Stroke Length of all Strokes
-				if (min_length_of_strokes.getState())
-				{
-					System.out.println("\t- Minimum Stroke Length of all Strokes: " + Tools.minStrokeLength(strokes));
-				}
-
-				//Maximum Stroke Length of all Strokes
-				if (max_length_of_strokes.getState())
-				{
-					System.out.println("\t- Maximum Stroke Length of all Strokes: " + Tools.maxStrokeLength(strokes));
-				}
-
-				//Average Stroke Length of all Strokes
-				if (avg_length_of_strokes.getState())
-				{
-					System.out.println("\t- Average Stroke Length of all Strokes: " + Tools.meanStrokeLength(strokes));
-				}
-
-				//Number of Strokes
-				if (number_of_strokes.getState())
-				{
-					System.out.println("\t- Number of Strokes: " + Tools.numStrokes(strokes));
-				}
-
-				//Average Distance Between Strokes
-				if (avg_distance_between_strokes.getState())
-				{
-					System.out.println("\t- Average Distance Between Strokes: " + Tools.avgDistBetweenStrokes(strokes));
-				}
-
-			}
-		}
-
-		private void applySingleStrokeFeatureModifications()
-		{
-			//initial check to see if there are strokes and that those strokes have more than one point in them
-			if(strokes.size()>0 && strokes.get(0).getPoints().size()>1)
-			{
-				//LSD Effect
-				if (lsd_effect.getState())
-				{
-					for(Stroke stroke : strokes)
-					{
-						if(stroke.getPoints().size()>1)
-						{
-							ArrayList<Stroke> newStrokes = Tools.lsdEffect(stroke);
-							for(Stroke newStroke : newStrokes)
-							{
-								drawnStrokes.add(newStroke);
-							}
-						}
-					}
-				}
-
-				//Mirror Horizontal
-				if (mirror_horizontal.getState())
-				{
-					for(Stroke stroke : strokes)
-					{
-						if(stroke.getPoints().size()>1)
-						{
-							drawnStrokes.add(Tools.mirrorHorizontalStroke(stroke,WINDOW_SIZE_X));
-						}
-					}
-				}
-
-				//Mirror Vertical
-				if (mirror_vertical.getState())
-				{
-					for(Stroke stroke : strokes)
-					{
-						if(stroke.getPoints().size()>1)
-						{
-							drawnStrokes.add(Tools.mirrorVerticalStroke(stroke,WINDOW_SIZE_Y));
-						}
-					}
-				}
-
-				//Dashed
-				if (dashed.getState())
-				{
-					for(Stroke stroke : strokes)
-					{
-						if(stroke.getPoints().size()>1)
-						{
-							ArrayList<Stroke> newStrokes = Tools.makeDashed(stroke);
-							for(Stroke newStroke : newStrokes)
-							{
-								drawnStrokes.add(newStroke);
-							}
-						}
-					}
-				}
-
-			}
-		}
-
-		private void applyMultiStrokeFeatureModifications()
-		{
-			//initial check to see if there is more than one stroke and that at least two of those strokes have more than one point in them
-			if(strokes.size()>1 && strokes.get(0).getPoints().size()>1 && strokes.get(1).getPoints().size()>1)
-			{
-				//Connect All Strokes
-				if (connect_strokes.getState())
-				{
-					ArrayList<Stroke> newStrokes = Tools.connectAllStrokes(strokes);
-					for(Stroke newStroke : newStrokes)
-					{
-						drawnStrokes.add(newStroke);
-					}
-				}
-
-				//Multiple LSD Effect
-				if (multi_lsd_effect.getState())
-				{
-					ArrayList<Stroke> newStrokes = Tools.lsdEverything(strokes);
-					for(Stroke newStroke : newStrokes)
-					{
-						drawnStrokes.add(newStroke);
-					}
-				}
-
-				//Mirror All Horizontal
-				if (mirror_all_horizontal.getState())
-				{
-					ArrayList<Stroke> newStrokes = Tools.mirrorAllHorizontal(strokes, WINDOW_SIZE_X);
-					for(Stroke newStroke : newStrokes)
-					{
-						drawnStrokes.add(newStroke);
-					}
-				}
-
-				//Mirror All Vertical
-				if (mirror_all_vertical.getState())
-				{
-					ArrayList<Stroke> newStrokes = Tools.mirrorAllVertical(strokes, WINDOW_SIZE_Y);
-					for(Stroke newStroke : newStrokes)
-					{
-						drawnStrokes.add(newStroke);
-					}
-				}
-
-				//Make all Dashed
-				if (all_dashed.getState())
-				{
-					ArrayList<Stroke> newStrokes = Tools.makeAllDashed(strokes);
-					for(Stroke newStroke : newStrokes)
-					{
-						drawnStrokes.add(newStroke);
-					}
-				}
-
-			}
-		}
-		}*/
 
 		// Paints the components in the window
 		protected void paintComponent(Graphics g)
@@ -546,12 +360,137 @@ public class TracingInterface
 		}
 	}
 	
+	// Modifies the strokes and repaints them
+	public void modifyStrokes()
+	{
+		// Populate modified strokes with the initial strokes
+		modifiedStrokes = new ArrayList<Stroke>();
+		
+		// Apply modifications
+		for (int i = 0; i < strokes.size(); i++)
+		{
+			Stroke tempStroke = strokes.get(i);
+			if (randomMessy.isSelected())
+				tempStroke = Tools.randomMessy(tempStroke);
+			if (accelerationMessy.isSelected())
+				tempStroke = Tools.accelerationMessy(tempStroke);
+			if (makeRigid.isSelected())
+				tempStroke = Tools.makeRigid(tempStroke);
+			if (subStrokesWithMinSpeed.isSelected())
+				tempStroke = Tools.subStrokesWithMinSpeed(tempStroke);
+			if (subStrokesWithMaxSpeed.isSelected())
+				tempStroke = Tools.subStrokesWithMaxSpeed(tempStroke);
+			if (elongateStroke.isSelected())
+				tempStroke = Tools.elongateStroke(tempStroke);
+			if (boundingBoxSubStrokes.isSelected())
+				tempStroke = Tools.boundingBoxSubStrokes(tempStroke);
+			if (lowerBoundShaded.isSelected())
+				tempStroke = Tools.lowerBoundShaded(tempStroke);
+			if (upperBoundShaded.isSelected())
+				tempStroke = Tools.upperBoundShaded(tempStroke);
+			if (ribbonEffect.isSelected())
+				tempStroke = Tools.ribbonEffect(tempStroke);
+			if (diamondBasedStroke.isSelected())
+				tempStroke = Tools.diamondBasedStroke(tempStroke);
+			if (mirrorVerticalStroke.isSelected())
+				tempStroke = Tools.mirrorVerticalStroke(tempStroke, WINDOW_SIZE_Y);
+			if (mirrorHorizontalStroke.isSelected())
+				tempStroke = Tools.mirrorHorizontalStroke(tempStroke, WINDOW_SIZE_X);
+			modifiedStrokes.add(tempStroke);
+		}
+		
+		// Multiple stroke modifications
+		if (fastStrokesOnly.isSelected())
+			modifiedStrokes = Tools.fastStrokesOnly(modifiedStrokes);
+		if (slowStrokesOnly.isSelected())
+			modifiedStrokes = Tools.slowStrokesOnly(modifiedStrokes);
+		if (connectBeginToEndOfAllStrokes.isSelected())
+			modifiedStrokes = Tools.connectBeginToEndOfAllStrokes(modifiedStrokes);
+		if (connectBeginToEndOfAllStrokesOnly.isSelected())
+			modifiedStrokes = Tools.connectBeginToEndOfAllStrokesOnly(modifiedStrokes);
+		if (makeDashed.isSelected())
+			modifiedStrokes = Tools.makeAllDashed(modifiedStrokes);
+		if (lsdEffect.isSelected())
+			modifiedStrokes = Tools.lsdEverything(modifiedStrokes);
+		
+		// Repaint the window
+		panel.repaint();
+	}
+	
+	// Lets the user choose their modification options
+	public void chooseModify()
+	{
+		// Set up window
+		modifyWindow = new JFrame("Modify Stroke");
+		modifyWindow.setSize(450, 350);
+		modifyWindow.setLocation(100, 50);
+		modifyWindow.setResizable(false);
+		modifyWindow.setVisible(true);
+		
+		modifyWindow.setLayout(new GridLayout(1, 2));
+		JPanel leftPanel = new JPanel();
+		leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
+		modifyWindow.add(leftPanel);
+		JPanel rightPanel = new JPanel();
+		rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
+		modifyWindow.add(rightPanel);
+		
+		// Choices
+		randomMessy = new JCheckBox("Random Messiness");
+		leftPanel.add(randomMessy);
+		accelerationMessy = new JCheckBox("Acceleration Messiness");
+		leftPanel.add(accelerationMessy);
+		boundingBoxSubStrokes = new JCheckBox("Alter Bounding Box");
+		leftPanel.add(boundingBoxSubStrokes);
+		lowerBoundShaded = new JCheckBox("Shade the Lower Bound");
+		leftPanel.add(lowerBoundShaded);
+		upperBoundShaded = new JCheckBox("Shade the Upper Bound");
+		leftPanel.add(upperBoundShaded);
+		makeRigid = new JCheckBox("Make Rigid");
+		leftPanel.add(makeRigid);
+		ribbonEffect = new JCheckBox("Ribbon Effect");
+		leftPanel.add(ribbonEffect);
+		diamondBasedStroke = new JCheckBox("Diamond-Based Stroke");
+		leftPanel.add(diamondBasedStroke);
+		subStrokesWithMinSpeed = new JCheckBox("Sub-Strokes, Min Speed");
+		leftPanel.add(subStrokesWithMinSpeed);
+		subStrokesWithMaxSpeed = new JCheckBox("Sub-Strokes, Max Speed");
+		leftPanel.add(subStrokesWithMaxSpeed);
+		connectBeginToEndOfAllStrokes = new JCheckBox("Connect Begin-to-End");
+		rightPanel.add(connectBeginToEndOfAllStrokes);
+		connectBeginToEndOfAllStrokesOnly = new JCheckBox("Connect Begin-to-End, Alternate");
+		rightPanel.add(connectBeginToEndOfAllStrokesOnly);
+		fastStrokesOnly = new JCheckBox("Fast Strokes Only");
+		rightPanel.add(fastStrokesOnly);
+		slowStrokesOnly = new JCheckBox("Slow Strokes Only");
+		rightPanel.add(slowStrokesOnly);
+		elongateStroke = new JCheckBox("Elongate Stroke");
+		rightPanel.add(elongateStroke);
+		makeDashed = new JCheckBox("Make Dashed");
+		rightPanel.add(makeDashed);
+		mirrorVerticalStroke = new JCheckBox("Mirror Vertical Stroke");
+		rightPanel.add(mirrorVerticalStroke);
+		mirrorHorizontalStroke = new JCheckBox("Mirror Horizontal Stroke");
+		rightPanel.add(mirrorHorizontalStroke);
+		lsdEffect = new JCheckBox("LSD Effect");
+		rightPanel.add(lsdEffect);
+		connectAllStrokes = new JCheckBox("Connect All Strokes");
+		rightPanel.add(connectAllStrokes);
+		
+		// Analyze button at the bottom
+		modifyButton = new JButton("Modify");
+		modifyButton.setBounds(150, 275, 100, 30);
+		JLayeredPane pane = modifyWindow.getLayeredPane();
+		pane.add(modifyButton, new Integer(1));
+		modifyButton.addActionListener(new MenuListener());
+	}
+	
 	// Lets the user choose their analysis options
 	public void chooseAnalysis()
 	{
 		// Set up window
 		analyzeWindow = new JFrame("Stroke Analysis");
-		analyzeWindow.setSize(500, 700);
+		analyzeWindow.setSize(500, 450);
 		analyzeWindow.setLocation(100, 50);
 		analyzeWindow.setResizable(false);
 		analyzeWindow.setVisible(true);
@@ -602,26 +541,22 @@ public class TracingInterface
 		leftPanel.add(cosEndingAngle);
 		sinEndingAngle = new JCheckBox("Sine of Ending Angle");
 		leftPanel.add(sinEndingAngle);
-		totalRotationalChange = new JCheckBox("Total Rotational Change");
-		leftPanel.add(totalRotationalChange);
-		totalAbsoluteRotation = new JCheckBox("Total Absolute Rotation Change");
-		leftPanel.add(totalAbsoluteRotation);
 		smoothness = new JCheckBox("Smoothness");
-		leftPanel.add(smoothness);
+		rightPanel.add(smoothness);
 		maximumSpeedSquared = new JCheckBox("Maximum Speed Squared");
-		leftPanel.add(maximumSpeedSquared);
+		rightPanel.add(maximumSpeedSquared);
 		minimumSpeedSquared = new JCheckBox("Minimum Speed Squared");
-		leftPanel.add(minimumSpeedSquared);
+		rightPanel.add(minimumSpeedSquared);
 		averageSpeedSquared = new JCheckBox("Average Speed Squared");
-		leftPanel.add(averageSpeedSquared);
+		rightPanel.add(averageSpeedSquared);
 		strokeTime = new JCheckBox("Stroke Time");
-		leftPanel.add(strokeTime);
+		rightPanel.add(strokeTime);
 		aspect = new JCheckBox("Aspect");
-		leftPanel.add(aspect);
+		rightPanel.add(aspect);
 		curvature = new JCheckBox("Curvature");
-		leftPanel.add(curvature);
+		rightPanel.add(curvature);
 		density1 = new JCheckBox("Density Metric 1");
-		leftPanel.add(density1);
+		rightPanel.add(density1);
 		density2 = new JCheckBox("Density Metric 2");
 		rightPanel.add(density2);
 		openness = new JCheckBox("Openness");
@@ -630,23 +565,25 @@ public class TracingInterface
 		rightPanel.add(areaOfBox);
 		logAreaOfBox = new JCheckBox("Log of Area of Bounding Box");
 		rightPanel.add(logAreaOfBox);
-		totalAngleOverAbsAngle = new JCheckBox("Total Angle / Absolute Angle");
-		rightPanel.add(totalAngleOverAbsAngle);
 		logTotalLength = new JCheckBox("Log of Total Length");
 		rightPanel.add(logTotalLength);
 		logOfCurviness = new JCheckBox("Log of Curviness");
 		rightPanel.add(logOfCurviness);
 		
+		// Travis's feature
+		longestPause = new JCheckBox("Longest Pause");
+		rightPanel.add(longestPause);
+		
 		// Analyze button at the bottom
 		analyzeButton = new JButton("Analyze");
-		analyzeButton.setBounds(100, 625, 100, 30);
+		analyzeButton.setBounds(100, 375, 100, 30);
 		JLayeredPane pane = analyzeWindow.getLayeredPane();
 		pane.add(analyzeButton, new Integer(1));
 		analyzeButton.addActionListener(new MenuListener());
 		
 		// Check All JCheckBox
 		selectAll = new JCheckBox("Check/Uncheck All");
-		selectAll.setBounds(275, 590, 200, 100);
+		selectAll.setBounds(275, 360, 200, 50);
 		pane.add(selectAll, new Integer(1));
 		selectAll.addActionListener(new MenuListener());
 	}
@@ -655,7 +592,7 @@ public class TracingInterface
 	public void printAnalysis()
 	{
 		printWindow = new JFrame("Stroke Analysis");
-		printWindow.setSize(600, 700);
+		printWindow.setSize(600, 500);
 		printWindow.setLocation(100, 50);
 		printWindow.setResizable(false);
 		printWindow.setVisible(true);
@@ -710,10 +647,14 @@ public class TracingInterface
 		if (averageDistanceBetween.isSelected())
 			leftText.append("Average Distance Between Strokes: " + myFormat.format(Tools.avgDistBetweenStrokes(strokes)) + "\n");
 		
+		// Longest Pause
+		if (longestPause.isSelected())
+			leftText.append("Longest Pause: " + myFormat.format(Tools.longestPause(strokes)) + "\n");
+		
 		// Move to single analysis
 		ImageIcon icon = new ImageIcon("arrow.gif");
 		singleButton = new JButton(icon);
-		singleButton.setBounds(500, 615, 61, 48);
+		singleButton.setBounds(500, 365, 61, 48);
 		JLayeredPane pane = printWindow.getLayeredPane();
 		pane.add(singleButton, new Integer(1));
 		singleButton.addActionListener(new MenuListener());
@@ -748,10 +689,6 @@ public class TracingInterface
 			leftText.append("Cosine of Ending Angle: " + myFormat.format(Tools.cosEndingAngle(strokes.get(index))) + "\n");
 		if (sinEndingAngle.isSelected())
 			leftText.append("Sine of Ending Angle: " + myFormat.format(Tools.sinEndingAngle(strokes.get(index))) + "\n");
-		if (totalRotationalChange.isSelected())
-			leftText.append("Total Rotational Change: " + myFormat.format(Tools.totalRotationalChange(strokes.get(index))) + "\n");
-		if (totalAbsoluteRotation.isSelected())
-			leftText.append("Total Absolute Rotation: " + myFormat.format(Tools.absoluteTotalRotationalChange(strokes.get(index))) + "\n");
 		if (smoothness.isSelected())
 			leftText.append("Smoothness: " + myFormat.format(Tools.smoothness(strokes.get(index))) + "\n");
 		if (maximumSpeedSquared.isSelected())
@@ -776,8 +713,6 @@ public class TracingInterface
 			leftText.append("Area of Bounding Box: " + myFormat.format(Tools.areaOfBoundingBox(strokes.get(index))) + "\n");
 		if (logAreaOfBox.isSelected())
 			leftText.append("Log of Area of Bounding Box: " + myFormat.format(Tools.logAreaOfBoundingbox(strokes.get(index))) + "\n");
-		if (totalAngleOverAbsAngle.isSelected())
-			leftText.append("Total Angle / Absolute Angle: " + myFormat.format(Tools.totalAngleOverAbsAngle(strokes.get(index))) + "\n");
 		if (logTotalLength.isSelected())
 			leftText.append("Log of Total Length: " + myFormat.format(Tools.logTotalLength(strokes.get(index))) + "\n");
 		if (logOfCurviness.isSelected())
