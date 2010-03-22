@@ -27,7 +27,7 @@ public class Tools
 
 		return ( (p2.getX() - p1.getX())
 				/
-				Math.sqrt(  Math.pow(  Math.abs( (p2.getY()- p1.getY()) ), 2) + 
+				Math.sqrt(  Math.pow(  Math.abs( (p2.getY()- p1.getY()) ), 2) +
 							Math.pow(  Math.abs( (p2.getX()- p1.getX()) ), 2) ) );
 	}
 
@@ -64,9 +64,9 @@ public class Tools
 		double currYmin = Double.POSITIVE_INFINITY;
 		Point pYmax = stroke.getPoint(0); //default initialization to make Eclipse happy
 		Point pYmin = stroke.getPoint(0); //default initialization to make Eclipse happy
-		
+
 		for(int i=0; i<stroke.getSize()-1; i++){
-			
+
 			if( stroke.getPoint(i).getX() >= currXmax )
 			{
 				pXmax = stroke.getPoint(i);
@@ -91,7 +91,7 @@ public class Tools
 				currYmin = pYmin.getY();
 			}
 		}
-		
+
 		return Math.sqrt( Math.pow( Math.abs( (pYmax.getY()- pYmin.getY()) ), 2) +
 						  Math.pow( Math.abs( (pXmax.getX()- pXmin.getX()) ), 2) );
 	}
@@ -197,15 +197,15 @@ public class Tools
 		/*
 		Point p0 = stroke.getPoint(0);
 		Point pN = stroke.getPoint(stroke.getSize());
-		
-		
+
+
 		double rise = pN.getY() - p0.getY();
 		double run = pN.getX() - p0.getX();
-		
+
 		double totalRotationalChange = Math.atan( rise / run );
 		return totalRotationalChange;
 		*/
-		
+
 		double totalRotationalChange = 0;
 		for(int i = stroke.getSize()-2; i > 1; i--){
 
@@ -213,8 +213,8 @@ public class Tools
 			Point pMinus1 = stroke.getPoint(i-1);
 			Point pMinus2 = stroke.getPoint(i-2);
 
-			
-			
+
+
 			totalRotationalChange += Math.atan(
 					(
 					( (p.getX()       - pMinus1.getX()) * (pMinus1.getY() - pMinus2.getY()) ) *
@@ -226,8 +226,8 @@ public class Tools
 				    );
 		}
 		return totalRotationalChange;
-		
-		
+
+
 	}
 
 	//Rubine feature 10
@@ -289,12 +289,12 @@ public class Tools
 	public static double maximumSpeedSquared(Stroke stroke){
 
 		double maximumSpeed = Double.NEGATIVE_INFINITY;
-		
-		
+
+
 		for(int i = 1; i < stroke.getSize()-2; i++){
-			
+
 			double currSpeed = 0;
-			
+
 			Point p 	  = stroke.getPoint(i);
 			Point pMinus1 = stroke.getPoint(i-1);
 
@@ -304,7 +304,7 @@ public class Tools
 			double d = t - tMinus1;
 			//System.out.println("d: " + d + "   P = " + p + "   pMinus1 = " + pMinus1);
 			//System.out.println("t = "+ t + "   tMinux1 = " + tMinus1);
-			
+
 			if( d == 0 ){
 				continue;
 			}
@@ -314,12 +314,12 @@ public class Tools
 					   			 Math.pow( d,2 )
 					  			);
 			}
-			
+
 			if( currSpeed > maximumSpeed )
-			 	{ 
+			 	{
 				maximumSpeed = currSpeed;
 			 	}
-			
+
 		}
 
 		return maximumSpeed;
@@ -334,7 +334,7 @@ public class Tools
 		for(int i = 1; i < stroke.getSize()-2; i++){
 
 			double currSpeed = 0;
-			
+
 			Point p 	  = stroke.getPoint(i);
 			Point pMinus1 = stroke.getPoint(i-1);
 
@@ -354,8 +354,8 @@ public class Tools
 					  			);
 			}
 			if( currSpeed < minimumSpeed )
-			 	{ 
-				minimumSpeed = currSpeed; 
+			 	{
+				minimumSpeed = currSpeed;
 				}
 		}
 		return minimumSpeed;
@@ -1111,47 +1111,47 @@ public class Tools
 		}
 		return newStrokes;
 	}
-	
+
 	//Makes elongates the stroke already drawn
 	//Mike Chenault
 	public static Stroke elongateStroke(Stroke origStroke) {
 		Stroke myStroke = new Stroke();
 		myStroke.equals(origStroke);
-	
+
 		for(int i = 0; i < myStroke.getPoints().size()-1; i++) {
 			int y2 = myStroke.getPoints().get(i+1).y;
 			int y1 = myStroke.getPoints().get(i).y;
 			int x2 = myStroke.getPoints().get(i+1).x;
 			int x1 = myStroke.getPoints().get(i).x;
-			
+
 			//get m
 			int m_top = y2 - y1;
 			int m_bot = x2 - x1;
 			double m = m_top / m_bot;
-			
+
 			Random rand = new Random();
 			int increaseY = rand.nextInt(21);
-			
+
 			//should y be going up or down
 			if(y2 < y1) {
 				increaseY = 0 - increaseY;
 			} else if (y2 == y1) {
 				increaseY = 0;
 			}
-			
+
 			int newX = (int)((y2 + increaseY - y1 - (m * x2)) / m);
-			
+
 			myStroke.getPoints().set(i+1, new Point(newX, y2 + increaseY));
-			
+
 			//Alter the rest of the strokes to fit
 			if(i+2 <= myStroke.getPoints().size()-1) {
 				int xDiff = newX - x2;
 				int yDiff = increaseY;
-			
+
 				for(int j = i+2; j < myStroke.getPoints().size(); j++) {
 					int currX = myStroke.getPoint(j).x;
 					int currY = myStroke.getPoint(j).y;
-					myStroke.getPoints().set(j, new Point(currX + xDiff, currY + yDiff)); 
+					myStroke.getPoints().set(j, new Point(currX + xDiff, currY + yDiff));
 				}
 			} //end if
 		}
@@ -1302,16 +1302,18 @@ public class Tools
 		Stroke newStroke = new Stroke(stroke.getColor());
 
 		//add beginning point
-		newStroke.addPoint(new Point(stroke.getPoint(0)));
-
-		for(int i=1; i < stroke.getPoints().size()-1; i+=5)
+		if(stroke.getPoints().size()>0)
 		{
-			newStroke.addPoint(stroke.getPoints().get(i));
+			newStroke.addPoint(new Point(stroke.getPoint(0)));
+
+			for(int i=1; i < stroke.getPoints().size()-1; i+=5)
+			{
+				newStroke.addPoint(stroke.getPoints().get(i));
+			}
+
+			//add end point
+			newStroke.addPoint(new Point(stroke.getPoint(stroke.getPoints().size()-1)));
 		}
-
-		//add end point
-		newStroke.addPoint(new Point(stroke.getPoint(stroke.getPoints().size()-1)));
-
 		return newStroke;
 	}
 
@@ -1336,17 +1338,20 @@ public class Tools
 			}
 
 			//add beginning point
-			newStroke.addPoint(new Point(stroke.getPoint(0)));
-			if(stroke.getPoints().size()>3)
-				newStroke.addPoint(ribbonEffectHelper(stroke.getPoint(0),stroke.getPoint(1)));
-			for(int i=1; i < stroke.getPoints().size()-2; i++)
+			if(stroke.getPoints().size()>0)
 			{
-				newStroke.addPoint(ribbonEffectHelper(stroke.getPoint(i),stroke.getPoint(i+1)));
+				newStroke.addPoint(new Point(stroke.getPoint(0)));
+				if(stroke.getPoints().size()>3)
+					newStroke.addPoint(ribbonEffectHelper(stroke.getPoint(0),stroke.getPoint(1)));
+				for(int i=1; i < stroke.getPoints().size()-2; i++)
+				{
+					newStroke.addPoint(ribbonEffectHelper(stroke.getPoint(i),stroke.getPoint(i+1)));
+				}
+				if(stroke.getPoints().size()>2)
+					newStroke.addPoint(ribbonEffectHelper(stroke.getPoint(stroke.getPoints().size()-2),stroke.getPoint(stroke.getPoints().size()-1)));
+				//add end point
+				newStroke.addPoint(new Point(stroke.getPoint(stroke.getPoints().size()-1)));
 			}
-			if(stroke.getPoints().size()>2)
-				newStroke.addPoint(ribbonEffectHelper(stroke.getPoint(stroke.getPoints().size()-2),stroke.getPoint(stroke.getPoints().size()-1)));
-			//add end point
-			newStroke.addPoint(new Point(stroke.getPoint(stroke.getPoints().size()-1)));
 
 		}
 
@@ -1422,17 +1427,19 @@ public class Tools
 		double changeInY = 0;
 		double speed = 0.25;
 
-		newStroke.addPoint(new Point(stroke.getPoint(0)));
-
-		for(int i = 1; i < stroke.getPoints().size(); i++)
+		if(stroke.getPoints().size()>0)
 		{
-			changeInX = Math.abs((stroke.getPoint(i).getX()-stroke.getPoint(i-1).getX())/(stroke.getTimestamp(i) - stroke.getTimestamp(i-1)));
-			changeInY = Math.abs((stroke.getPoint(i).getY()-stroke.getPoint(i-1).getY())/(stroke.getTimestamp(i) - stroke.getTimestamp(i-1)));
+			newStroke.addPoint(new Point(stroke.getPoint(0)));
 
-			if(changeInX < speed && changeInY < speed)
-				newStroke.addPoint(new Point((stroke.getPoint(i))));
+			for(int i = 1; i < stroke.getPoints().size(); i++)
+			{
+				changeInX = Math.abs((stroke.getPoint(i).getX()-stroke.getPoint(i-1).getX())/(stroke.getTimestamp(i) - stroke.getTimestamp(i-1)));
+				changeInY = Math.abs((stroke.getPoint(i).getY()-stroke.getPoint(i-1).getY())/(stroke.getTimestamp(i) - stroke.getTimestamp(i-1)));
+
+				if(changeInX < speed && changeInY < speed)
+					newStroke.addPoint(new Point((stroke.getPoint(i))));
+			}
 		}
-
 		return newStroke;
 	}
 
@@ -1450,17 +1457,19 @@ public class Tools
 		double changeInY = 0;
 		double speed = 0.75;
 
-		newStroke.addPoint(new Point(stroke.getPoint(0)));
-
-		for(int i = 1; i < stroke.getPoints().size(); i++)
+		if(stroke.getPoints().size()>0)
 		{
-			changeInX = Math.abs((stroke.getPoint(i).getX()-stroke.getPoint(i-1).getX())/(stroke.getTimestamp(i) - stroke.getTimestamp(i-1)));
-			changeInY = Math.abs((stroke.getPoint(i).getY()-stroke.getPoint(i-1).getY())/(stroke.getTimestamp(i) - stroke.getTimestamp(i-1)));
+			newStroke.addPoint(new Point(stroke.getPoint(0)));
 
-			if(changeInX > speed && changeInY > speed)
-				newStroke.addPoint(new Point((stroke.getPoint(i))));
+			for(int i = 1; i < stroke.getPoints().size(); i++)
+			{
+				changeInX = Math.abs((stroke.getPoint(i).getX()-stroke.getPoint(i-1).getX())/(stroke.getTimestamp(i) - stroke.getTimestamp(i-1)));
+				changeInY = Math.abs((stroke.getPoint(i).getY()-stroke.getPoint(i-1).getY())/(stroke.getTimestamp(i) - stroke.getTimestamp(i-1)));
+
+				if(changeInX > speed && changeInY > speed)
+					newStroke.addPoint(new Point((stroke.getPoint(i))));
+			}
 		}
-
 		return newStroke;
 	}
 
@@ -1480,8 +1489,8 @@ public class Tools
 			{
 				if(myStroke.getPoints().size()>0 && stroke.getPoints().size()>2)
 				{
-					stroke.addPoint(myStroke.getPoint(0));
-					stroke.addPoint(stroke.getPoint(stroke.getPoints().size()-2));
+					stroke.addPoint(new Point(myStroke.getPoint(0)));
+					stroke.addPoint(new Point(stroke.getPoint(stroke.getPoints().size()-2)));
 				}
 			}
 		}
@@ -1546,8 +1555,9 @@ public class Tools
 		double time = 200;
 
 		for(Stroke stroke : strokes)
-			if(stroke.getStrokeDuration() < time && stroke.getStrokeDuration() > 0)
-				newStrokes.add(stroke);
+			if(stroke.getPoints().size()>0)
+				if(stroke.getStrokeDuration() < time && stroke.getStrokeDuration() > 0)
+					newStrokes.add(stroke);
 		return newStrokes;
 	}
 
@@ -1564,11 +1574,9 @@ public class Tools
 		double time = 500;
 
 		for(Stroke stroke : strokes)
-		{
-			System.out.println(stroke.toString());
-			if(stroke.getStrokeDuration() > time)
-				newStrokes.add(stroke);
-		}
+			if(stroke.getPoints().size()>0)
+				if(stroke.getStrokeDuration() > time)
+					newStrokes.add(stroke);
 		return newStrokes;
 	}
 
