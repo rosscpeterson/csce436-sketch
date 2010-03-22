@@ -961,7 +961,6 @@ public class Tools
 	//Mike Chenault
 	public static ArrayList<Stroke> connectAllStrokes(ArrayList<Stroke> myStrokes)
 	{
-		int i;
 		ArrayList<Stroke> newStrokes = new ArrayList<Stroke>();
 
 		for(Stroke myStroke : myStrokes)
@@ -969,9 +968,9 @@ public class Tools
 			newStrokes.add(myStroke);
 		}
 
-		for(i = 0; i < myStrokes.size() - 1; i++)
+		for(int i = 0; i < myStrokes.size() - 1; i++)
 		{
-			if(i!=myStrokes.size()-1  && (myStrokes.get(i+1).getPoints().size()>1))
+			if(i<myStrokes.size()-1  && (myStrokes.get(i+1).getPoints().size()>1))
 			{
 				Stroke newStroke = new Stroke(myStrokes.get(i).getColor());
 				newStroke.addPoint(myStrokes.get(i).getPoints().get(myStrokes.get(i).getPoints().size()-1));
@@ -1115,8 +1114,13 @@ public class Tools
 	//Makes elongates the stroke already drawn
 	//Mike Chenault
 	public static Stroke elongateStroke(Stroke origStroke) {
-		Stroke myStroke = new Stroke(origStroke.getColor());
-		myStroke.equals(origStroke);
+		Stroke myStroke = new Stroke(origStroke);
+		
+		int incAmt = 11 - (int)(myStroke.getSize());
+		if(incAmt <= 0) {
+			incAmt = 1;
+		}
+		//myStroke = origStroke;
 
 		for(int i = 0; i < myStroke.getPoints().size()-1; i++) {
 			int y2 = myStroke.getPoints().get(i+1).y;
@@ -1127,10 +1131,15 @@ public class Tools
 			//get m
 			int m_top = y2 - y1;
 			int m_bot = x2 - x1;
-			double m = m_top / m_bot;
+			double m;
+			if(m_bot == 0) {
+				m = 1;
+			} else {
+				m = m_top / m_bot;
+			}
 
 			Random rand = new Random();
-			int increaseY = rand.nextInt(21);
+			int increaseY = rand.nextInt(incAmt);
 
 			//should y be going up or down
 			if(y2 < y1) {
@@ -1139,7 +1148,7 @@ public class Tools
 				increaseY = 0;
 			}
 
-			int newX = (int)((y2 + increaseY - y1 - (m * x2)) / m);
+			int newX = (int)((y2 + increaseY - y1 + (m * x1)) / m);	//find new x2
 
 			myStroke.getPoints().set(i+1, new Point(newX, y2 + increaseY));
 
