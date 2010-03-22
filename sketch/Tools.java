@@ -1608,7 +1608,7 @@ public class Tools
 		double longestPause = 0;
 		double pause = 0;
 
-		for(int i = 0; i < strokes.size(); i++)
+		for(int i = 0; i < strokes.size() - 1; i++)
 		{
 			if(strokes.get(i+1).getPoints().size()>0 && strokes.get(i).getPoints().size()>0)
 			{

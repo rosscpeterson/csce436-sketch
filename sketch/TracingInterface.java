@@ -60,6 +60,10 @@ public class TracingInterface
 	private ArrayList<Stroke> strokes;
 	private ArrayList<Stroke> modifiedStrokes;
 	private int current_stroke, analysis_index;
+	private JMenu personas;
+	
+	// Menus for modifications
+	JMenuItem angry, artsy, dyslexic, relaxed, explosive, psychotic, anxious;
 	
 	// Checkboxes for analysis
 	JCheckBox singleStrokeLengths, allStrokeLength, minStrokeLength, maxStrokeLength,
@@ -99,10 +103,36 @@ public class TracingInterface
 		color = new JMenu("Color");
 		analyze = new JMenu("Analyze");
 		modify = new JMenu("Modify");
+		personas = new JMenu("Personas");
 		menuBar.add(file);
 		menuBar.add(color);
 		menuBar.add(analyze);
 		menuBar.add(modify);
+		menuBar.add(personas);
+		
+		// Persona menu
+		PersonaListener pl = new PersonaListener();
+		angry = new JMenuItem("Angry");
+		personas.add(angry);
+		angry.addActionListener(pl);
+		artsy = new JMenuItem("Artsy");
+		personas.add(artsy);
+		artsy.addActionListener(pl);
+		dyslexic = new JMenuItem("Dyslexic");
+		personas.add(dyslexic);
+		dyslexic.addActionListener(pl);
+		relaxed = new JMenuItem("Relaxed");
+		personas.add(relaxed);
+		relaxed.addActionListener(pl);
+		explosive = new JMenuItem("Explosive");
+		personas.add(explosive);
+		explosive.addActionListener(pl);
+		psychotic = new JMenuItem("Psychotic");
+		personas.add(psychotic);
+		psychotic.addActionListener(pl);
+		anxious = new JMenuItem("Anxious");
+		personas.add(anxious);
+		anxious.addActionListener(pl);
 
 		// Set up the file menu
 		clear = new JMenuItem("Clear");
@@ -163,6 +193,117 @@ public class TracingInterface
 		// Display the window
 		window.setVisible(true);
 		window.setResizable(false);
+	}
+	
+	// Listener for persona buttons
+	private class PersonaListener implements ActionListener
+	{
+		public void actionPerformed(ActionEvent e)
+		{
+			if (e.getSource() == angry)
+			{
+				// Populate modified strokes with the initial strokes
+				modifiedStrokes = new ArrayList<Stroke>();
+				
+				// Apply modifications
+				for (int i = 0; i < strokes.size() - 1; i++)
+				{
+					Stroke tempStroke = new Stroke(strokes.get(i));
+					tempStroke = Tools.randomMessy(tempStroke);
+					modifiedStrokes.add(tempStroke);
+				}
+				
+				panel.repaint();
+			} else if (e.getSource() == artsy)
+			{
+				// Populate modified strokes with the initial strokes
+				modifiedStrokes = new ArrayList<Stroke>();
+				
+				// Apply modifications
+				for (int i = 0; i < strokes.size() - 1; i++)
+				{
+					Stroke tempStroke = new Stroke(strokes.get(i));
+					tempStroke = Tools.ribbonEffect(tempStroke);
+					tempStroke = Tools.diamondBasedStroke(tempStroke);
+					modifiedStrokes.add(tempStroke);
+				}
+				panel.repaint();
+			} else if (e.getSource() == dyslexic)
+			{
+				// Populate modified strokes with the initial strokes
+				modifiedStrokes = new ArrayList<Stroke>();
+				
+				// Apply modifications
+				for (int i = 0; i < strokes.size() - 1; i++)
+				{
+					Stroke tempStroke = new Stroke(strokes.get(i));
+					tempStroke = Tools.mirrorHorizontalStroke(tempStroke, 700);
+					modifiedStrokes.add(tempStroke);
+				}
+				panel.repaint();
+			} else if (e.getSource() == relaxed)
+			{
+				// Populate modified strokes with the initial strokes
+				modifiedStrokes = new ArrayList<Stroke>();
+				
+				// Apply modifications
+				for (int i = 0; i < strokes.size() - 1; i++)
+				{
+					Stroke tempStroke = new Stroke(strokes.get(i));
+					tempStroke = Tools.makeRigid(tempStroke);
+					modifiedStrokes.add(tempStroke);
+				}
+				panel.repaint();
+			} else if (e.getSource() == explosive)
+			{
+				// Populate modified strokes with the initial strokes
+				modifiedStrokes = new ArrayList<Stroke>();
+				
+				// Apply modifications
+				for (int i = 0; i < strokes.size() - 1; i++)
+				{
+					Stroke tempStroke = new Stroke(strokes.get(i));
+					tempStroke = Tools.accelerationMessy(tempStroke);
+					tempStroke = Tools.ribbonEffect(tempStroke);
+					tempStroke = Tools.lowerBoundShaded(tempStroke);
+					modifiedStrokes.add(tempStroke);
+				}
+				modifiedStrokes = Tools.lsdEverything(modifiedStrokes);
+				panel.repaint();
+			} else if (e.getSource() == anxious)
+			{
+				// Populate modified strokes with the initial strokes
+				modifiedStrokes = new ArrayList<Stroke>();
+				
+				// Apply modifications
+				for (int i = 0; i < strokes.size() - 1; i++)
+				{
+					Stroke tempStroke = new Stroke(strokes.get(i));
+					tempStroke = Tools.randomMessy(tempStroke);
+					modifiedStrokes.add(tempStroke);
+				}
+				modifiedStrokes = Tools.makeAllDashed(modifiedStrokes);
+				panel.repaint();
+			} else if (e.getSource() == psychotic)
+			{
+				// Populate modified strokes with the initial strokes
+				modifiedStrokes = new ArrayList<Stroke>();
+				
+				// Apply modifications
+				for (int i = 0; i < strokes.size() - 1; i++)
+				{
+					Stroke tempStroke = new Stroke(strokes.get(i));
+					tempStroke = Tools.randomMessy(tempStroke);
+					tempStroke = Tools.ribbonEffect(tempStroke);
+					tempStroke = Tools.mirrorHorizontalStroke(tempStroke, 700);
+					tempStroke = Tools.mirrorVerticalStroke(tempStroke, 700);
+					//tempStroke = Tools.lowerBoundShaded(tempStroke);
+					modifiedStrokes.add(tempStroke);
+				}
+				modifiedStrokes = Tools.makeAllDashed(modifiedStrokes);
+				panel.repaint();
+			}
+		}
 	}
 
 	// Listener for various menu options
@@ -412,6 +553,8 @@ public class TracingInterface
 			modifiedStrokes = Tools.makeAllDashed(modifiedStrokes);
 		if (lsdEffect.isSelected())
 			modifiedStrokes = Tools.lsdEverything(modifiedStrokes);
+		if (connectAllStrokes.isSelected())
+			modifiedStrokes = Tools.connectAllStrokes(modifiedStrokes);
 		
 		// Repaint the window
 		panel.repaint();
