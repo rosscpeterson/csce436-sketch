@@ -27,6 +27,19 @@ public class Stroke
 		color = c;
 	}
 	
+	Stroke(Stroke otherStroke)
+	{
+		points = new ArrayList<Point>();
+		timestamps = new ArrayList<Long>();
+		color = otherStroke.getColor();
+		
+		for (int i = 0; i < otherStroke.getSize(); i++)
+		{
+			points.add(otherStroke.getPoint(i));
+			timestamps.add(otherStroke.getTimestamp(i));
+		}
+	}
+	
 	public void showStats() {
 		System.out.println("Points Size = " + points.size() + "\ntimeStamps Size = " + timestamps.size());
 	}

@@ -367,7 +367,7 @@ public class TracingInterface
 		modifiedStrokes = new ArrayList<Stroke>();
 		
 		// Apply modifications
-		for (int i = 0; i < strokes.size(); i++)
+		for (int i = 0; i < strokes.size() - 1; i++)
 		{
 			Stroke tempStroke = strokes.get(i);
 			if (randomMessy.isSelected())

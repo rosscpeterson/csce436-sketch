@@ -1014,7 +1014,7 @@ public class Tools
 				{
 					for(int i = 1; i < myStrokes.get(j).getPoints().size(); i++)
 					{
-						Stroke newStroke = new Stroke();
+						Stroke newStroke = new Stroke(myStrokes.get(j).getColor());
 						newStroke.addPoint(startPoint);
 						newStroke.addPoint(myStrokes.get(j).getPoints().get(i));
 						newStrokes.add(newStroke);
@@ -1029,7 +1029,7 @@ public class Tools
 	//Mike Chenault
 	public static Stroke mirrorHorizontalStroke(Stroke stroke, int windowSize_X)
 	{
-		Stroke newStroke = new Stroke();
+		Stroke newStroke = new Stroke(stroke.getColor());
 		for(int i = 0; i < stroke.getPoints().size(); i++)
 		{
 			int diff = windowSize_X - (int)stroke.getPoints().get(i).getX();
@@ -1043,7 +1043,7 @@ public class Tools
 	//Mike Chenault
 	public static Stroke mirrorVerticalStroke(Stroke stroke, int windowSize_Y)
 	{
-		Stroke newStroke = new Stroke();
+		Stroke newStroke = new Stroke(stroke.getColor());
 		for(int i = 0; i < stroke.getPoints().size(); i++)
 		{
 			int diff = windowSize_Y - (int)stroke.getPoints().get(i).getY();
@@ -1082,11 +1082,11 @@ public class Tools
 	public static ArrayList<Stroke> makeDashed(Stroke stroke)
 	{
 		ArrayList<Stroke> newStrokes = new ArrayList<Stroke>();
-		for(int i = 0; i < stroke.getPoints().size()-1; i+=2)
+		for(int i = 0; i < stroke.getPoints().size() - 1; i+=2)
 		{
 			if(i+1 < stroke.getPoints().size())
 			{
-				Stroke newStroke = new Stroke();
+				Stroke newStroke = new Stroke(stroke.getColor());
 				newStroke.addPoint(stroke.getPoints().get(i));
 				newStroke.addPoint(stroke.getPoints().get(i+1));
 				newStrokes.add(newStroke);
@@ -1115,7 +1115,7 @@ public class Tools
 	//Makes elongates the stroke already drawn
 	//Mike Chenault
 	public static Stroke elongateStroke(Stroke origStroke) {
-		Stroke myStroke = new Stroke();
+		Stroke myStroke = new Stroke(origStroke.getColor());
 		myStroke.equals(origStroke);
 
 		for(int i = 0; i < myStroke.getPoints().size()-1; i++) {
@@ -1483,9 +1483,16 @@ public class Tools
 	 */
 	public static ArrayList<Stroke> connectBeginToEndOfAllStrokes(ArrayList<Stroke> strokes)
 	{
+		ArrayList<Stroke> newStrokes = new ArrayList<Stroke>();
+
 		for(Stroke stroke : strokes)
 		{
-			for(Stroke myStroke : strokes)
+			newStrokes.add(new Stroke(stroke));
+		}
+		
+		for(Stroke stroke : newStrokes)
+		{
+			for(Stroke myStroke : newStrokes)
 			{
 				if(myStroke.getPoints().size()>0 && stroke.getPoints().size()>2)
 				{
@@ -1495,7 +1502,7 @@ public class Tools
 			}
 		}
 
-		return strokes;
+		return newStrokes;
 	}
 
 	/**
@@ -1592,7 +1599,7 @@ public class Tools
 		double longestPause = 0;
 		double pause = 0;
 
-		for(int i = 0; i < strokes.size()-1; i++)
+		for(int i = 0; i < strokes.size(); i++)
 		{
 			if(strokes.get(i+1).getPoints().size()>0 && strokes.get(i).getPoints().size()>0)
 			{
