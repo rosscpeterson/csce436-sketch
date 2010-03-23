@@ -1177,36 +1177,28 @@ public class Tools
 	public static Stroke randomMessy(Stroke stroke)
 	{
 		java.util.Random rand = new java.util.Random();
-		Stroke newStroke = new Stroke(stroke.getColor());
-		ArrayList<Point> newStrokePoints = new ArrayList<Point>();
-
-		//add all points currently in stroke to a new list of points
-		for(Point point : stroke.getPoints())
-			newStrokePoints.add(new Point((int)point.getX(), (int)point.getY()));
+		Stroke newStroke = new Stroke(stroke);
 
 		//change all points by a small random offset
-		for(Point point : newStrokePoints)
-		{
+		for(Point point : newStroke.getPoints())
 			point.setLocation(point.getX() + rand.nextInt(11) - rand.nextInt(11), point.getY() + rand.nextInt(11) - rand.nextInt(11));
-			newStroke.addPoint(point);
-		}
 
 		return newStroke;
 	}
-
+	
 	/**
-	 *	Make the stroke messy based on a change in acceleration
+	 *	This is the accelerationMessy function without checking to see if the function is dividing by zero...
 	 *	Author: Travis
 	 *
 	 *	@param stroke the original stroke to be modified
-	 *	@return a new stroke with a acceleration-based offset on each point
+	 *	@return a stroke that somehow allows dividing by zero
 	 */
-	public static Stroke accelerationMessy(Stroke stroke)
+	public static Stroke divideByZero(Stroke stroke)
 	{
-		Stroke newStroke = new Stroke(stroke.getColor());
+		Stroke newStroke = new Stroke(stroke);
 		double changeInX = 0;
 		double changeInY = 0;
-
+	
 		//change all points by an offset
 		for(int i = 0; i < stroke.getSize(); i++)
 		{
@@ -1227,6 +1219,46 @@ public class Tools
 
 		return newStroke;
 	}
+	
+	
+	/**
+	 *	Make the stroke messy based on a change in acceleration
+	 *	Author: Travis
+	 *
+	 *	@param stroke the original stroke to be modified
+	 *	@return a new stroke with a acceleration-based offset on each point
+	 */
+	public static Stroke accelerationMessy(Stroke stroke)
+	{
+		Stroke newStroke = new Stroke(stroke);
+		double changeInX = 0;
+		double changeInY = 0;
+
+		//change all points by an offset
+		for(int i = 0; i < stroke.getSize(); i++)
+		{
+			if(i>0)
+			{	
+				changeInX = 0;
+				changeInY = 0;
+				
+				if((stroke.getTimestamp(i) - stroke.getTimestamp(i-1))>0)
+				{
+					//calculate the acceleration a^2/t
+					changeInX = (Math.pow(stroke.getPoint(i).getX()-stroke.getPoint(i-1).getX(),2))/(stroke.getTimestamp(i) - stroke.getTimestamp(i-1));
+					changeInY = (Math.pow(stroke.getPoint(i).getY()-stroke.getPoint(i-1).getY(),2))/(stroke.getTimestamp(i) - stroke.getTimestamp(i-1));
+				}
+				//account for decelleration
+				if(stroke.getPoint(i).getX()-stroke.getPoint(i-1).getX()<0)
+					changeInX*=-1;
+				if(stroke.getPoint(i).getY()-stroke.getPoint(i-1).getY()<0)
+					changeInY*=-1;
+			}
+			newStroke.getPoint(i).setLocation((int)(stroke.getPoint(i).getX() + changeInX), (int)(stroke.getPoint(i).getY() + changeInY));
+		}
+		
+		return newStroke;
+	}
 
 	/**
 	 *	Make each stroke contain the bounding box of each point to point substroke
@@ -1240,18 +1272,23 @@ public class Tools
 		Stroke newStroke = new Stroke(stroke.getColor());
 
 		//change all points by an offset
-		for(int i = 0; i < stroke.getPoints().size()-1; i++)
+		for(int i = 0; i < stroke.getSize()-1; i++)
 		{
 			//original x and original y
 			newStroke.addPoint(new Point(stroke.getPoint(i)));
+			newStroke.addTimestamp(new Long(stroke.getTimestamp(i)));
 			//next x and original y
 			newStroke.addPoint(new Point((int)(stroke.getPoint(i+1).getX()), (int)(stroke.getPoint(i).getY())));
+			newStroke.addTimestamp(new Long(stroke.getTimestamp(i)));
 			//next x and next y
 			newStroke.addPoint(new Point(stroke.getPoint(i+1)));
+			newStroke.addTimestamp(new Long(stroke.getTimestamp(i)));
 			//original x and next y
 			newStroke.addPoint(new Point((int)(stroke.getPoint(i).getX()), (int)(stroke.getPoint(i+1).getY())));
+			newStroke.addTimestamp(new Long(stroke.getTimestamp(i)));
 			//original x and original y
 			newStroke.addPoint(new Point(stroke.getPoint(i)));
+			newStroke.addTimestamp(new Long(stroke.getTimestamp(i)));
 		}
 
 		return newStroke;
@@ -1268,11 +1305,14 @@ public class Tools
 	{
 		Stroke newStroke = new Stroke(stroke.getColor());
 
-		for(Point point : stroke.getPoints())
+		for(int i = 0; i < stroke.getSize(); i++)
 		{
-			newStroke.addPoint(point);
-			newStroke.addPoint(new Point((int)point.getX(),(int)(point.getY() + TracingInterface.WINDOW_SIZE_Y)));
-			newStroke.addPoint(point);
+			newStroke.addPoint(new Point(stroke.getPoint(i)));
+			newStroke.addTimestamp(new Long(stroke.getTimestamp(i)));
+			newStroke.addPoint(new Point((int)stroke.getPoint(i).getX(),(int)(stroke.getPoint(i).getY() + TracingInterface.WINDOW_SIZE_Y)));
+			newStroke.addTimestamp(new Long(stroke.getTimestamp(i)));
+			newStroke.addPoint(new Point(stroke.getPoint(i)));
+			newStroke.addTimestamp(new Long(stroke.getTimestamp(i)));
 		}
 
 		return newStroke;
@@ -1289,11 +1329,14 @@ public class Tools
 	{
 		Stroke newStroke = new Stroke(stroke.getColor());
 
-		for(Point point : stroke.getPoints())
+		for(int i = 0; i < stroke.getSize(); i++)
 		{
-			newStroke.addPoint(point);
-			newStroke.addPoint(new Point((int)point.getX(),(int)(point.getY() - TracingInterface.WINDOW_SIZE_Y)));
-			newStroke.addPoint(point);
+			newStroke.addPoint(new Point(stroke.getPoint(i)));
+			newStroke.addTimestamp(new Long(stroke.getTimestamp(i)));
+			newStroke.addPoint(new Point((int)stroke.getPoint(i).getX(),(int)(stroke.getPoint(i).getY() - TracingInterface.WINDOW_SIZE_Y)));
+			newStroke.addTimestamp(new Long(stroke.getTimestamp(i)));
+			newStroke.addPoint(new Point(stroke.getPoint(i)));
+			newStroke.addTimestamp(new Long(stroke.getTimestamp(i)));
 		}
 
 		return newStroke;
@@ -1311,17 +1354,20 @@ public class Tools
 		Stroke newStroke = new Stroke(stroke.getColor());
 
 		//add beginning point
-		if(stroke.getPoints().size()>0)
+		if(stroke.getSize()>0)
 		{
 			newStroke.addPoint(new Point(stroke.getPoint(0)));
+			newStroke.addTimestamp(new Long(stroke.getTimestamp(0)));
 
 			for(int i=1; i < stroke.getPoints().size()-1; i+=5)
 			{
-				newStroke.addPoint(stroke.getPoints().get(i));
+				newStroke.addPoint(new Point(stroke.getPoints().get(i)));
+				newStroke.addTimestamp(new Long(stroke.getTimestamp(i)));
 			}
 
 			//add end point
-			newStroke.addPoint(new Point(stroke.getPoint(stroke.getPoints().size()-1)));
+			newStroke.addPoint(new Point(stroke.getPoint(stroke.getSize()-1)));
+			newStroke.addTimestamp(new Long(stroke.getTimestamp(stroke.getSize()-1)));
 		}
 		return newStroke;
 	}
@@ -1340,26 +1386,32 @@ public class Tools
 		for(int k = 0; k < 7; k++)
 		{
 			if(k != 0)
-			{
-				stroke = new Stroke(newStroke.getColor());
-				for(Point point : newStroke.getPoints())
-					stroke.addPoint(point);
-			}
+				stroke = new Stroke(newStroke);
 
 			//add beginning point
-			if(stroke.getPoints().size()>0)
+			if(stroke.getSize()>0)
 			{
 				newStroke.addPoint(new Point(stroke.getPoint(0)));
-				if(stroke.getPoints().size()>3)
-					newStroke.addPoint(ribbonEffectHelper(stroke.getPoint(0),stroke.getPoint(1)));
-				for(int i=1; i < stroke.getPoints().size()-2; i++)
+				newStroke.addTimestamp(new Long(stroke.getTimestamp(0)));
+				if(stroke.getSize()>3)
 				{
-					newStroke.addPoint(ribbonEffectHelper(stroke.getPoint(i),stroke.getPoint(i+1)));
+					newStroke.addPoint(new Point(ribbonEffectHelper(stroke.getPoint(0),stroke.getPoint(1))));
+					newStroke.addTimestamp(new Long(stroke.getTimestamp(0)));
 				}
-				if(stroke.getPoints().size()>2)
-					newStroke.addPoint(ribbonEffectHelper(stroke.getPoint(stroke.getPoints().size()-2),stroke.getPoint(stroke.getPoints().size()-1)));
+				for(int i=1; i < stroke.getSize()-2; i++)
+				{
+					newStroke.addPoint(new Point(ribbonEffectHelper(stroke.getPoint(i),stroke.getPoint(i+1))));
+					newStroke.addTimestamp(new Long(stroke.getTimestamp(i)));
+				}
+				
+				if(stroke.getSize()>2)
+				{
+					newStroke.addPoint(new Point(ribbonEffectHelper(stroke.getPoint(stroke.getSize()-2),stroke.getPoint(stroke.getSize()-1))));
+					newStroke.addTimestamp(new Long(stroke.getTimestamp(stroke.getSize()-2)));
+				}
 				//add end point
-				newStroke.addPoint(new Point(stroke.getPoint(stroke.getPoints().size()-1)));
+				newStroke.addPoint(new Point(stroke.getPoint(stroke.getSize()-1)));
+				newStroke.addTimestamp(new Long(stroke.getTimestamp(stroke.getSize()-1)));
 			}
 
 		}
@@ -1408,16 +1460,22 @@ public class Tools
 		{
 			//original x and original y
 			newStroke.addPoint(new Point(stroke.getPoint(i)));
+			newStroke.addTimestamp(new Long(stroke.getTimestamp(i)));
 			//next x and original y
 			newStroke.addPoint(new Point((int)((stroke.getPoint(i).getX() + stroke.getPoint(i+1).getX())/2), (int)(stroke.getPoint(i).getY())));
+			newStroke.addTimestamp(new Long(stroke.getTimestamp(i)));
 			//next x and next y
 			newStroke.addPoint(new Point(stroke.getPoint(i+1)));
+			newStroke.addTimestamp(new Long(stroke.getTimestamp(i)));
 			//original x and next y
 			newStroke.addPoint(new Point((int)((stroke.getPoint(i).getX() + stroke.getPoint(i+1).getX())/2), (int)(stroke.getPoint(i+1).getY())));
+			newStroke.addTimestamp(new Long(stroke.getTimestamp(i)));
 			//original x and original y
 			newStroke.addPoint(new Point(stroke.getPoint(i)));
+			newStroke.addTimestamp(new Long(stroke.getTimestamp(i)));
 			//original x and next y
 			newStroke.addPoint(new Point((int)((stroke.getPoint(i).getX() + stroke.getPoint(i+1).getX())/2), (int)(stroke.getPoint(i+1).getY())));
+			newStroke.addTimestamp(new Long(stroke.getTimestamp(i)));
 		}
 		return newStroke;
 	}
@@ -1436,17 +1494,27 @@ public class Tools
 		double changeInY = 0;
 		double speed = 0.25;
 
-		if(stroke.getPoints().size()>0)
+		if(stroke.getSize()>0)
 		{
 			newStroke.addPoint(new Point(stroke.getPoint(0)));
+			newStroke.addTimestamp(new Long(stroke.getTimestamp(0)));
 
-			for(int i = 1; i < stroke.getPoints().size(); i++)
+			for(int i = 1; i < stroke.getSize(); i++)
 			{
-				changeInX = Math.abs((stroke.getPoint(i).getX()-stroke.getPoint(i-1).getX())/(stroke.getTimestamp(i) - stroke.getTimestamp(i-1)));
-				changeInY = Math.abs((stroke.getPoint(i).getY()-stroke.getPoint(i-1).getY())/(stroke.getTimestamp(i) - stroke.getTimestamp(i-1)));
-
+				changeInX = 0;
+				changeInY = 0;
+				
+				if((stroke.getTimestamp(i) - stroke.getTimestamp(i-1))>0)
+				{
+					changeInX = Math.abs((stroke.getPoint(i).getX()-stroke.getPoint(i-1).getX())/(stroke.getTimestamp(i) - stroke.getTimestamp(i-1)));
+					changeInY = Math.abs((stroke.getPoint(i).getY()-stroke.getPoint(i-1).getY())/(stroke.getTimestamp(i) - stroke.getTimestamp(i-1)));
+				}
+					
 				if(changeInX < speed && changeInY < speed)
-					newStroke.addPoint(new Point((stroke.getPoint(i))));
+				{
+					newStroke.addPoint(new Point(stroke.getPoint(i)));
+					newStroke.addTimestamp(new Long(stroke.getTimestamp(i)));
+				}
 			}
 		}
 		return newStroke;
@@ -1469,14 +1537,21 @@ public class Tools
 		if(stroke.getPoints().size()>0)
 		{
 			newStroke.addPoint(new Point(stroke.getPoint(0)));
+			newStroke.addTimestamp(new Long(stroke.getTimestamp(0)));
 
-			for(int i = 1; i < stroke.getPoints().size(); i++)
+			for(int i = 1; i < stroke.getSize(); i++)
 			{
-				changeInX = Math.abs((stroke.getPoint(i).getX()-stroke.getPoint(i-1).getX())/(stroke.getTimestamp(i) - stroke.getTimestamp(i-1)));
-				changeInY = Math.abs((stroke.getPoint(i).getY()-stroke.getPoint(i-1).getY())/(stroke.getTimestamp(i) - stroke.getTimestamp(i-1)));
-
+				if((stroke.getTimestamp(i) - stroke.getTimestamp(i-1))>0)
+				{
+					changeInX = Math.abs((stroke.getPoint(i).getX()-stroke.getPoint(i-1).getX())/(stroke.getTimestamp(i) - stroke.getTimestamp(i-1)));
+					changeInY = Math.abs((stroke.getPoint(i).getY()-stroke.getPoint(i-1).getY())/(stroke.getTimestamp(i) - stroke.getTimestamp(i-1)));
+				}
+				
 				if(changeInX > speed && changeInY > speed)
-					newStroke.addPoint(new Point((stroke.getPoint(i))));
+				{
+					newStroke.addPoint(new Point(stroke.getPoint(i)));
+					newStroke.addTimestamp(new Long(stroke.getTimestamp(i)));
+				}
 			}
 		}
 		return newStroke;
@@ -1503,10 +1578,12 @@ public class Tools
 		{
 			for(Stroke myStroke : newStrokes)
 			{
-				if(myStroke.getPoints().size()>0 && stroke.getPoints().size()>2)
+				if(myStroke.getPoints().size()>0 && stroke.getSize()>2)
 				{
 					stroke.addPoint(new Point(myStroke.getPoint(0)));
-					stroke.addPoint(new Point(stroke.getPoint(stroke.getPoints().size()-2)));
+					stroke.addTimestamp(new Long(myStroke.getTimestamp(0)));
+					stroke.addPoint(new Point(stroke.getPoint(stroke.getSize()-2)));
+					stroke.addTimestamp(new Long(stroke.getTimestamp(stroke.getSize()-2)));
 				}
 			}
 		}
@@ -1529,13 +1606,15 @@ public class Tools
 
 		for(Stroke stroke : strokes)
 		{
-			if(stroke.getPoints().size()>0)
+			if(stroke.getSize()>0)
 			{
 				newStroke = new Stroke(stroke.getColor());
 				//add the first element of the stroke
-				newStroke.addPoint(stroke.getPoint(0));
+				newStroke.addPoint(new Point(stroke.getPoint(0)));
+				newStroke.addTimestamp(new Long(stroke.getTimestamp(0)));
 				//add the last element of the stroke
-				newStroke.addPoint(stroke.getPoint(stroke.getPoints().size()-1));
+				newStroke.addPoint(new Point(stroke.getPoint(stroke.getSize()-1)));
+				newStroke.addTimestamp(new Long(stroke.getTimestamp(stroke.getSize()-1)));
 				//add the new stroke to the list
 				newStrokes.add(newStroke);
 			}
@@ -1547,10 +1626,12 @@ public class Tools
 		{
 			for(Stroke myStroke : newStrokes)
 			{
-				if(myStroke.getPoints().size()>1 && stroke.getPoints().size()>1)
+				if(myStroke.getSize()>1 && stroke.getSize()>1)
 				{
-					stroke.addPoint(myStroke.getPoint(0));
-					stroke.addPoint(stroke.getPoint(1));
+					stroke.addPoint(new Point(myStroke.getPoint(0)));
+					stroke.addTimestamp(new Long(myStroke.getTimestamp(0)));
+					stroke.addPoint(new Point(stroke.getPoint(1)));
+					stroke.addTimestamp(new Long(stroke.getTimestamp(1)));
 				}
 			}
 		}
@@ -1571,7 +1652,7 @@ public class Tools
 		double time = 200;
 
 		for(Stroke stroke : strokes)
-			if(stroke.getPoints().size()>0)
+			if(stroke.getSize()>0)
 				if(stroke.getStrokeDuration() < time && stroke.getStrokeDuration() > 0)
 					newStrokes.add(stroke);
 		return newStrokes;
@@ -1590,7 +1671,7 @@ public class Tools
 		double time = 500;
 
 		for(Stroke stroke : strokes)
-			if(stroke.getPoints().size()>0)
+			if(stroke.getSize()>0)
 				if(stroke.getStrokeDuration() > time)
 					newStrokes.add(stroke);
 		return newStrokes;
@@ -1608,11 +1689,11 @@ public class Tools
 		double longestPause = 0;
 		double pause = 0;
 
-		for(int i = 0; i < strokes.size() - 1; i++)
+		for(int i = 0; i < strokes.size()-1; i++)
 		{
-			if(strokes.get(i+1).getPoints().size()>0 && strokes.get(i).getPoints().size()>0)
+			if(strokes.get(i+1).getSize()>0 && strokes.get(i).getSize()>0)
 			{
-				pause = strokes.get(i+1).getTimestamp(strokes.get(i+1).getPoints().size()-1) - strokes.get(i).getTimestamp(0);
+				pause = strokes.get(i+1).getTimestamp(0) - strokes.get(i).getTimestamp(strokes.get(i).getSize()-1);
 				if(pause > longestPause)
 					longestPause = pause;
 			}
@@ -1620,6 +1701,4 @@ public class Tools
 
 		return longestPause;
 	}
-
 }
-
