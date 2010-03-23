@@ -35,8 +35,8 @@ public class Stroke
 		
 		for (int i = 0; i < otherStroke.getSize(); i++)
 		{
-			points.add(otherStroke.getPoint(i));
-			timestamps.add(otherStroke.getTimestamp(i));
+			points.add(new Point(otherStroke.getPoint(i)));
+			timestamps.add(new Long(otherStroke.getTimestamp(i)));
 		}
 	}
 	
