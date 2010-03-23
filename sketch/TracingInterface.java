@@ -63,7 +63,7 @@ public class TracingInterface
 	private JMenu personas;
 	
 	// Menus for modifications
-	JMenuItem angry, artsy, dyslexic, relaxed, explosive, psychotic, anxious;
+	JMenuItem angry, artsy, dyslexic, relaxed, explosive, psychotic, anxious, retro;
 	
 	// Checkboxes for analysis
 	JCheckBox singleStrokeLengths, allStrokeLength, minStrokeLength, maxStrokeLength,
@@ -133,6 +133,9 @@ public class TracingInterface
 		anxious = new JMenuItem("Anxious");
 		personas.add(anxious);
 		anxious.addActionListener(pl);
+		retro = new JMenuItem("Retro");
+		personas.add(retro);
+		retro.addActionListener(pl);
 
 		// Set up the file menu
 		clear = new JMenuItem("Clear");
@@ -210,6 +213,7 @@ public class TracingInterface
 				{
 					Stroke tempStroke = new Stroke(strokes.get(i));
 					tempStroke = Tools.randomMessy(tempStroke);
+					tempStroke = Tools.accelerationMessy(tempStroke);
 					modifiedStrokes.add(tempStroke);
 				}
 				
@@ -265,7 +269,8 @@ public class TracingInterface
 					Stroke tempStroke = new Stroke(strokes.get(i));
 					tempStroke = Tools.accelerationMessy(tempStroke);
 					tempStroke = Tools.ribbonEffect(tempStroke);
-					tempStroke = Tools.lowerBoundShaded(tempStroke);
+					//tempStroke = Tools.lowerBoundShaded(tempStroke);
+					//tempStroke = Tools.upperBoundShaded(tempStroke);
 					modifiedStrokes.add(tempStroke);
 				}
 				modifiedStrokes = Tools.lsdEverything(modifiedStrokes);
@@ -297,10 +302,24 @@ public class TracingInterface
 					tempStroke = Tools.ribbonEffect(tempStroke);
 					tempStroke = Tools.mirrorHorizontalStroke(tempStroke, 700);
 					tempStroke = Tools.mirrorVerticalStroke(tempStroke, 700);
-					//tempStroke = Tools.lowerBoundShaded(tempStroke);
 					modifiedStrokes.add(tempStroke);
 				}
 				modifiedStrokes = Tools.makeAllDashed(modifiedStrokes);
+				panel.repaint();
+			} else if (e.getSource() == retro)
+			{
+				// Populate modified strokes with the initial strokes
+				modifiedStrokes = new ArrayList<Stroke>();
+				
+				// Apply modifications
+				for (int i = 0; i < strokes.size() - 1; i++)
+				{
+					Stroke tempStroke = new Stroke(strokes.get(i));
+					tempStroke = Tools.subStrokesWithMinSpeed(tempStroke);
+					tempStroke = Tools.diamondBasedStroke(tempStroke);
+					modifiedStrokes.add(tempStroke);
+				}
+				modifiedStrokes = Tools.slowStrokesOnly(modifiedStrokes);
 				panel.repaint();
 			}
 		}

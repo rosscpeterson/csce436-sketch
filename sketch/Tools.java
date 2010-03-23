@@ -968,7 +968,7 @@ public class Tools
 			newStrokes.add(myStroke);
 		}
 
-		for(int i = 0; i < myStrokes.size() - 1; i++)
+		for(int i = 0; i < myStrokes.size(); i++)
 		{
 			if(i<myStrokes.size()-1  && (myStrokes.get(i+1).getPoints().size()>1))
 			{
